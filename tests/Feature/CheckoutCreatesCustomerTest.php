@@ -138,6 +138,7 @@ class CheckoutCreatesCustomerTest extends TestCase
         $this->get($response->headers->get('Location'))
             ->assertOk()
             ->assertSee("لتأكيد الاوردر رقم: {$order->order_number}")
+            ->assertSee('لتتبع الاوردر الخاص بك ارسل لنا هذا الكود فقط')
             ->assertSee('https://wa.me/201000000000', false);
     }
 
@@ -145,7 +146,7 @@ class CheckoutCreatesCustomerTest extends TestCase
     {
         $provider = DeliveryProvider::create([
             'name' => 'Ozone Express',
-            'slug' => 'ozone-' . Str::random(8),
+            'slug' => 'ozone-'.Str::random(8),
             'base_url' => 'https://api.ozonexpress.ma/customers',
             'is_active' => true,
         ]);
@@ -167,13 +168,13 @@ class CheckoutCreatesCustomerTest extends TestCase
     {
         $category = Category::create([
             'name' => 'Dresses',
-            'slug' => 'dresses-' . Str::random(8),
+            'slug' => 'dresses-'.Str::random(8),
         ]);
 
         $product = Product::create([
             'category_id' => $category->id,
             'name' => 'Abaya',
-            'slug' => 'abaya-' . Str::random(8),
+            'slug' => 'abaya-'.Str::random(8),
             'description' => 'Test product',
             'selling_price' => 100,
             'thumbnail' => 'thumb.jpg',
@@ -185,7 +186,7 @@ class CheckoutCreatesCustomerTest extends TestCase
         $skuCode = SkuCode::create([
             'skuable_type' => Product::class,
             'skuable_id' => $product->id,
-            'sku_code' => 'SKU-' . Str::upper(Str::random(8)),
+            'sku_code' => 'SKU-'.Str::upper(Str::random(8)),
         ]);
 
         $cart = Cart::create([

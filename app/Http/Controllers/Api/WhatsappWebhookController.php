@@ -80,22 +80,58 @@ class WhatsappWebhookController extends Controller
             if ($order) {
                 $inboxMessage->markAsRead();
 
-                $result = (new WhatsappService($session))->sendText(
-                    $order->whatsapp_phone ?: ($message['from'] ?? ''),
-                    $confirmationService->confirmationReply($order),
-                );
-
-                if (! $result['success']) {
-                    Log::warning('WhatsApp order confirmation reply failed', [
+                $this->sendOrderMessage(
+                    session: $session,
+                    phone: $order->whatsapp_phone ?: ($message['from'] ?? ''),
+                    text: $confirmationService->confirmationReply($order),
+                    logContext: [
+                        'type' => 'confirmation',
                         'order_number' => $order->order_number,
                         'whatsapp_phone' => $order->whatsapp_phone,
-                        'error' => $result['error'],
-                    ]);
+                    ],
+                );
+            } else {
+                $trackedOrder = $confirmationService->orderFromIncomingMessage($message['text'] ?? '');
+
+                if ($trackedOrder) {
+                    $inboxMessage->markAsRead();
+
+                    $this->sendOrderMessage(
+                        session: $session,
+                        phone: $trackedOrder->whatsapp_phone ?: ($message['from'] ?? ''),
+                        text: $confirmationService->trackingReply($trackedOrder),
+                        logContext: [
+                            'type' => 'tracking',
+                            'order_number' => $trackedOrder->order_number,
+                            'whatsapp_phone' => $trackedOrder->whatsapp_phone ?: ($message['from'] ?? ''),
+                        ],
+                    );
                 }
             }
         }
 
         return response()->json(['ok' => true]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $logContext
+     */
+    private function sendOrderMessage(
+        WhatsappSession $session,
+        string $phone,
+        string $text,
+        array $logContext
+    ): void {
+        $result = (new WhatsappService($session))->sendText(
+            $phone,
+            $text,
+        );
+
+        if (! $result['success']) {
+            Log::warning('WhatsApp order reply failed', array_merge($logContext, [
+                'error' => $result['error'],
+            ]));
+        }
     }
 
     /**

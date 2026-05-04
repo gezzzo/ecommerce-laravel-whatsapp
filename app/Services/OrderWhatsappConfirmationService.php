@@ -15,7 +15,11 @@ class OrderWhatsappConfirmationService
 {
     public function confirmationMessage(Order $order): string
     {
-        return "لتأكيد الاوردر رقم: {$order->order_number}";
+        return implode("\n", [
+            "لتأكيد الاوردر رقم: {$order->order_number}",
+            'لتتبع الاوردر الخاص بك ارسل لنا هذا الكود فقط:',
+            $order->order_number,
+        ]);
     }
 
     public function confirmationUrl(Order $order): ?string
@@ -32,7 +36,7 @@ class OrderWhatsappConfirmationService
             return null;
         }
 
-        return 'https://wa.me/' . $phone . '?text=' . rawurlencode($this->confirmationMessage($order));
+        return 'https://wa.me/'.$phone.'?text='.rawurlencode($this->confirmationMessage($order));
     }
 
     public function confirmationSession(): ?WhatsappSession
@@ -50,6 +54,10 @@ class OrderWhatsappConfirmationService
         ?string $text,
         ?string $messageId = null
     ): ?Order {
+        if (! $this->hasConfirmationIntent($text ?? '')) {
+            return null;
+        }
+
         $orderNumber = $this->extractOrderNumber($text ?? '');
 
         if (! $orderNumber) {
@@ -72,6 +80,19 @@ class OrderWhatsappConfirmationService
         ]);
 
         return $order->refresh();
+    }
+
+    public function orderFromIncomingMessage(?string $text): ?Order
+    {
+        $orderNumber = $this->extractOrderNumber($text ?? '');
+
+        if (! $orderNumber) {
+            return null;
+        }
+
+        return Order::query()
+            ->where('order_number', $orderNumber)
+            ->first();
     }
 
     public function confirmationReply(Order $order): string
@@ -105,10 +126,37 @@ class OrderWhatsappConfirmationService
             "المدينة: {$order->city}",
             "العنوان: {$order->address}",
             filled($items) ? "المنتجات:\n{$items}" : null,
-            'الإجمالي: ' . Number::format((float) $order->total, 2) . ' درهم',
-            'الدفع: ' . $this->paymentMethodLabel($order->payment_method),
+            'الإجمالي: '.Number::format((float) $order->total, 2).' درهم',
+            'الدفع: '.$this->paymentMethodLabel($order->payment_method),
+            "لتتبع الاوردر الخاص بك ارسل لنا هذا الكود فقط: {$order->order_number}",
             'سنتواصل معك قريباً لتجهيز الطلب.',
         ]));
+    }
+
+    public function trackingReply(Order $order): string
+    {
+        $order->loadMissing([
+            'trackingParcels' => fn ($query) => $query->latest('time')->latest('id'),
+        ]);
+
+        $latestTracking = $order->trackingParcels->first();
+
+        return implode("\n", array_filter([
+            'تتبع طلبك 🔎',
+            "رقم الطلب: {$order->order_number}",
+            'حالة الطلب: '.($order->status_label ?: 'قيد المراجعة'),
+            $order->tracking_number ? "رقم الشحنة: {$order->tracking_number}" : 'رقم الشحنة: لم يصدر بعد',
+            $latestTracking?->statut_name ? "آخر تحديث: {$latestTracking->statut_name}" : null,
+            $latestTracking?->situation_name ? "الوضع الحالي: {$latestTracking->situation_name}" : null,
+            $latestTracking?->time ? 'وقت التحديث: '.$latestTracking->time->format('Y-m-d H:i') : null,
+            'الإجمالي: '.Number::format((float) $order->total, 2).' درهم',
+            $order->tracking_number ? null : 'سنرسل لك رقم الشحنة بمجرد تسليم الطلب لشركة الشحن.',
+        ]));
+    }
+
+    private function hasConfirmationIntent(string $text): bool
+    {
+        return Str::contains(Str::lower($text), ['تأكيد', 'تاكيد', 'confirm']);
     }
 
     private function extractOrderNumber(string $text): ?string
@@ -130,7 +178,7 @@ class OrderWhatsappConfirmationService
         $digits = User::normalizePhone($phone);
 
         if (str_starts_with($digits, '0')) {
-            return '2' . $digits;
+            return '2'.$digits;
         }
 
         return $digits;
