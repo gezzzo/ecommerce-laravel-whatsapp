@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan *)",
+      "Bash(vendor/bin/pint *)",
+      "mcp__laravel-boost__database-schema",
+      "mcp__laravel-boost__application-info",
+      "mcp__laravel-boost__search-docs",
+      "Bash(grep *)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "laravel-boost"
+  ]
+}

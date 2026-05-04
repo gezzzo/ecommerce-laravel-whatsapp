@@ -1,0 +1,112 @@
+{
+    "categories": {
+        "data": [
+            {
+                "id": 7,
+                "slug": "mlabs-almhgbat",
+                "name": "\u0645\u0644\u0627\u0628\u0633 \u0627\u0644\u0645\u062d\u062c\u0628\u0627\u062a",
+                "deleted_at": null,
+                "created_at": "2025-07-08T21:21:48.000000Z",
+                "updated_at": "2025-07-08T21:21:48.000000Z",
+                "attachments": [
+                    {
+                        "id": 2,
+                        "attachable_type": "App\\Models\\Category",
+                        "attachable_id": 7,
+                        "type": "image\/jpeg",
+                        "file_path": "attachments\/gI4nayDDbGteP2Gw6sEn4lD2JNvw2OIxP9EwqcKE.jpg",
+                        "created_at": "2025-07-08T21:41:13.000000Z",
+                        "updated_at": "2025-07-08T21:41:13.000000Z"
+                    }
+                ]
+            },
+            {
+                "id": 8,
+                "slug": "bkhor-amaraty",
+                "name": "\u0628\u062e\u0648\u0631 \u0627\u0645\u0627\u0631\u0627\u062a\u064a\u0629",
+                "deleted_at": null,
+                "created_at": "2025-07-09T00:37:55.000000Z",
+                "updated_at": "2025-07-09T00:37:55.000000Z",
+                "attachments": [
+                    {
+                        "id": 5,
+                        "attachable_type": "App\\Models\\Category",
+                        "attachable_id": 8,
+                        "type": "image\/jpeg",
+                        "file_path": "attachments\/coqi3qKq6RIJWlsYHvYC1gohSBU4XX2hCMrrlAPd.jpg",
+                        "created_at": "2025-07-09T00:37:55.000000Z",
+                        "updated_at": "2025-07-09T00:37:55.000000Z"
+                    }
+                ]
+            },
+            {
+                "id": 9,
+                "slug": "aator-amaraty",
+                "name": "\u0639\u0637\u0648\u0631 \u0627\u0645\u0627\u0631\u0627\u062a\u064a\u0629",
+                "deleted_at": null,
+                "created_at": "2025-07-09T00:43:15.000000Z",
+                "updated_at": "2025-07-09T00:43:15.000000Z",
+                "attachments": [
+                    {
+                        "id": 7,
+                        "attachable_type": "App\\Models\\Category",
+                        "attachable_id": 9,
+                        "type": "image\/jpeg",
+                        "file_path": "attachments\/uVjNbAkB0l7ynpVYhU6vWU4EQlguh3eXE5xXOXzy.jpg",
+                        "created_at": "2025-07-09T00:44:40.000000Z",
+                        "updated_at": "2025-07-09T00:44:40.000000Z"
+                    }
+                ]
+            },
+            {
+                "id": 10,
+                "slug": "aabaaa-mrym",
+                "name": "\u0639\u0628\u0627\u0621\u0629 \u0645\u0631\u064a\u0645",
+                "deleted_at": null,
+                "created_at": "2025-08-14T17:13:43.000000Z",
+                "updated_at": "2025-08-14T17:13:43.000000Z",
+                "attachments": [
+                    {
+                        "id": 56,
+                        "attachable_type": "App\\Models\\Category",
+                        "attachable_id": 10,
+                        "type": "image\/jpeg",
+                        "file_path": "attachments\/TDCfcd7U0l8dxpZKr2uyOKq36VXo9aMxzBWhSHgE.jpg",
+                        "created_at": "2025-08-14T17:13:43.000000Z",
+                        "updated_at": "2025-08-14T17:13:43.000000Z"
+                    }
+                ]
+            },
+            {
+                "id": 11,
+                "slug": "bak-agml-hdy",
+                "name": "\u0628\u0627\u0643 \u0623\u062c\u0645\u0644 \u0647\u062f\u064a\u0629 \ud83c\udf81",
+                "deleted_at": null,
+                "created_at": "2025-11-26T16:58:06.000000Z",
+                "updated_at": "2025-11-26T16:58:06.000000Z",
+                "attachments": []
+            }
+        ],
+        "first_page_url": "https:\/\/backend.tijaracod.com\/api\/admin\/category?page=1",
+        "from": 1,
+        "last_page": 1,
+        "last_page_url": "https:\/\/backend.tijaracod.com\/api\/admin\/category?page=1",
+        "links": [
+            {
+                "url": null,
+                "label": "&laquo; Previous",
+                "active": false
+            },
+            {
+                "url": "https:\/\/backend.tijaracod.com\/api\/admin\/category?page=1",
+                "label": "1",
+                "active": true
+            },
+            {
+                "url": null,
+                "label": "Next &raquo;",
+                "active": false
+            }
+        ]
+    }
+}
