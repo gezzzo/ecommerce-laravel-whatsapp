@@ -40,7 +40,7 @@ class OrdersTable
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('whatsapp_confirmation_status')
-                    ->label(__('WhatsApp confirmation'))
+                    ->label(__('Confirmation'))
                     ->state(fn (Order $record): string => $record->whatsapp_confirmed_at ? __('Confirmed') : __('Waiting'))
                     ->badge()
                     ->color(fn (Order $record): string => $record->whatsapp_confirmed_at ? 'success' : 'warning'),
@@ -113,6 +113,23 @@ class OrdersTable
                     ]),
             ])
             ->recordActions([
+
+                Action::make('confirm_whatsapp')
+                    ->label(__('Confirm WhatsApp'))
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn (Order $record): bool => $record->whatsapp_confirmed_at === null)
+                    ->action(function (Order $record): void {
+                        $record->update([
+                            'whatsapp_confirmed_at' => now(),
+                        ]);
+
+                        Notification::make()
+                            ->title(__('WhatsApp confirmation saved'))
+                            ->success()
+                            ->send();
+                    })
+                    ->requiresConfirmation(),
 
                 Action::make('whatsapp')
                     ->label(__('order.fields.whatsapp_text'))
