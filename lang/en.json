@@ -340,7 +340,12 @@
     "order.placeholders.status_change_reason": "Reason for changing the status",
     "order.placeholders.delivery_status_change_reason": "Reason for changing delivery status",
     "order.placeholders.not_specified": "Not specified",
+    "order.tracking.no_data_title": "No tracking data found",
+    "order.tracking.no_data_body": "No tracking updates are saved for this order yet.",
+    "order.tracking.courier": "Courier",
     "No active delivery company found.": "No active delivery company found.",
     "Please choose a delivery zone before sending this order.": "Please choose a delivery zone before sending this order.",
-    "city belongs to another company please change it.": "City belongs to another company, please change it."
+    "city belongs to another company please change it.": "City belongs to another company, please change it.",
+    "Missing delivery tracking number.": "Missing delivery tracking number.",
+    "No delivery company is linked to this order.": "No delivery company is linked to this order."
 }

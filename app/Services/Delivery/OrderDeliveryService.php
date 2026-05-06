@@ -62,4 +62,19 @@ class OrderDeliveryService
             'result' => $result,
         ];
     }
+
+    public function track(Order $order): string
+    {
+        $order->loadMissing(['deliveryCompany.provider']);
+
+        if (! $order->tracking_number) {
+            throw new \RuntimeException(__('Missing delivery tracking number.'));
+        }
+
+        if (! $order->deliveryCompany) {
+            throw new \RuntimeException(__('No delivery company is linked to this order.'));
+        }
+
+        return $this->gateway->track($order, $order->deliveryCompany);
+    }
 }

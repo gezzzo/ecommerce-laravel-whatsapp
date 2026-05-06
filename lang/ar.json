@@ -465,7 +465,12 @@
     "order.placeholders.status_change_reason": "سبب تغيير الحالة",
     "order.placeholders.delivery_status_change_reason": "سبب تغيير حالة التوصيل",
     "order.placeholders.not_specified": "غير محدد",
+    "order.tracking.no_data_title": "لا توجد بيانات تتبع",
+    "order.tracking.no_data_body": "لم يتم حفظ أي تحديثات تتبع لهذا الطلب حتى الآن.",
+    "order.tracking.courier": "المندوب",
     "No active delivery company found.": "لا توجد شركة توصيل نشطة.",
     "Please choose a delivery zone before sending this order.": "يرجى اختيار منطقة التوصيل قبل إرسال الطلب.",
-    "city belongs to another company please change it.": "المدينة تابعة لشركة توصيل أخرى، يرجى تغييرها."
+    "city belongs to another company please change it.": "المدينة تابعة لشركة توصيل أخرى، يرجى تغييرها.",
+    "Missing delivery tracking number.": "رقم التتبع غير موجود.",
+    "No delivery company is linked to this order.": "لا توجد شركة توصيل مرتبطة بهذا الطلب."
 }

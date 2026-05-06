@@ -229,8 +229,9 @@ class OrdersTable
                     ->visible(fn (Order $record): bool => $record->tracking_number !== null)
                     ->modalHeading(__('order.modals.tracking_history_heading'))
                     ->modalContent(function (Order $record) {
-                        $trackingRecords = $record->orderTracking()
+                        $trackingRecords = $record->trackingParcels()
                             ->orderBy('time', 'desc')
+                            ->orderBy('id', 'desc')
                             ->get();
 
                         if ($trackingRecords->isEmpty()) {

@@ -351,6 +351,63 @@ class OzoneHandlerTest extends TestCase
         ]);
     }
 
+    public function test_order_delivery_service_tracks_assigned_company(): void
+    {
+        $this->order->update(['tracking_number' => 'OZ-SERVICE-TRACK']);
+
+        Http::fake([
+            'api.ozonexpress.ma/*' => Http::response([
+                'TRACKING' => [
+                    'TRACKING-NUMBER' => 'OZ-SERVICE-TRACK',
+                    'LAST_TRACKING' => ['STATUT' => 'In distribution'],
+                    'HISTORY' => [
+                        [
+                            'STATUT' => 'In distribution',
+                            'TIME_STR' => '2026-04-30 12:00:00',
+                            'COMMENT' => 'Package is moving',
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $status = app(OrderDeliveryService::class)->track($this->order);
+
+        $this->assertSame('In distribution', $status);
+        $this->assertSame('In distribution', $this->order->fresh()->delivery_status);
+
+        $this->assertDatabaseHas('tracking_parcels', [
+            'order_id' => $this->order->id,
+            'statut_name' => 'In distribution',
+        ]);
+    }
+
+    public function test_tracking_history_modal_view_renders_tracking_parcels(): void
+    {
+        $this->order->update([
+            'tracking_number' => 'OZ-HISTORY-001',
+            'delivery_status' => 'Picked Up',
+        ]);
+
+        TrackingParcel::create([
+            'order_id' => $this->order->id,
+            'parcel_code' => 'OZ-HISTORY-001',
+            'statut_name' => 'Picked Up',
+            'situation_name' => 'In transit',
+            'commentaire' => 'Package picked up',
+            'time' => '2026-04-30 10:00:00',
+        ]);
+
+        $html = view('filament.modals.tracking-history', [
+            'trackingRecords' => $this->order->trackingParcels()->orderBy('time', 'desc')->get(),
+            'order' => $this->order->fresh(),
+        ])->render();
+
+        $this->assertStringContainsString('OZ-HISTORY-001', $html);
+        $this->assertStringContainsString('Picked Up', $html);
+        $this->assertStringContainsString('Package picked up', $html);
+    }
+
     public function test_track_skips_update_when_manual_delivery_status(): void
     {
         $this->order->update([
