@@ -8,10 +8,13 @@ use App\Filament\Admin\Widgets\MonthlyComparisonWidget;
 use App\Filament\Admin\Widgets\PaymentMethodChartWidget;
 use App\Filament\Admin\Widgets\SalesTrendChartWidget;
 use BackedEnum;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Pages\Page;
 
 class ReportsPage extends Page
 {
+    use HasPageShield;
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?string $slug = 'reports';

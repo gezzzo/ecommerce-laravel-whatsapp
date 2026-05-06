@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Coupons;
 use App\Models\Product;
 use App\Models\SkuCode;
 use App\Models\Variant;
@@ -62,9 +63,15 @@ class CartController extends Controller
         }
 
         $shipping = $subtotal >= 200 ? 0 : 30;
-        $total = $subtotal + $shipping;
+        $appliedCoupon = $subtotal > 0 ? $this->appliedCoupon() : null;
+        $discount = $appliedCoupon?->discountFor((float) $subtotal) ?? 0;
+        $total = max(0, $subtotal + $shipping - $discount);
 
-        return view('cart.index', compact('cartItems', 'subtotal', 'shipping', 'total'));
+        if ($subtotal <= 0) {
+            session()->forget('coupon_code');
+        }
+
+        return view('cart.index', compact('cartItems', 'subtotal', 'shipping', 'discount', 'total', 'appliedCoupon'));
     }
 
     public function add(Request $request): RedirectResponse
@@ -173,6 +180,26 @@ class CartController extends Controller
         session(['cart_id' => $cart->id]);
 
         return $cart;
+    }
+
+    private function appliedCoupon(): ?Coupons
+    {
+        $couponCode = session('coupon_code');
+
+        if (! filled($couponCode)) {
+            return null;
+        }
+
+        $coupon = Coupons::query()
+            ->available()
+            ->where('code', $couponCode)
+            ->first();
+
+        if (! $coupon) {
+            session()->forget('coupon_code');
+        }
+
+        return $coupon;
     }
 
     private function resolveSkuCode(Product $product, ?int $variantId): ?SkuCode

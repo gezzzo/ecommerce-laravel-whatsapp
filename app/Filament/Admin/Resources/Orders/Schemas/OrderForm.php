@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Orders\Schemas;
 
+use App\Models\Coupons;
 use App\Models\DeliveryCompany;
 use App\Models\DeliveryZone;
 use Filament\Forms\Components\DateTimePicker;
@@ -10,6 +11,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -129,7 +132,11 @@ class OrderForm
                             ->required()
                             ->numeric()
                             ->default(0)
-                            ->prefix(__('MAD')),
+                            ->prefix(__('MAD'))
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function (Get $get, Set $set): void {
+                                self::refreshCouponTotals($get, $set);
+                            }),
                         TextInput::make('tracking_number')
                             ->label(__('Tracking Number'))
                             ->maxLength(255),
@@ -145,13 +152,34 @@ class OrderForm
                             ->label(__('Subtotal'))
                             ->required()
                             ->numeric()
-                            ->prefix(__('MAD')),
+                            ->prefix(__('MAD'))
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function (Get $get, Set $set): void {
+                                self::refreshCouponTotals($get, $set);
+                            }),
+                        Select::make('coupon_id')
+                            ->label(__('Coupon'))
+                            ->relationship(
+                                'coupon',
+                                'code',
+                                fn (Builder $query): Builder => $query->available(),
+                            )
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->afterStateUpdated(function (Get $get, Set $set): void {
+                                self::refreshCouponTotals($get, $set);
+                            }),
                         TextInput::make('discount')
                             ->label(__('Discount'))
                             ->required()
                             ->numeric()
                             ->default(0)
-                            ->prefix(__('MAD')),
+                            ->prefix(__('MAD'))
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function (Get $get, Set $set): void {
+                                self::refreshTotal($get, $set);
+                            }),
                         TextInput::make('total')
                             ->label(__('Total'))
                             ->required()
@@ -163,5 +191,41 @@ class OrderForm
                     ])
                     ->columns(2),
             ]);
+    }
+
+    private static function refreshCouponTotals(Get $get, Set $set): void
+    {
+        $subtotal = (float) ($get('subtotal') ?? 0);
+        $shipping = (float) ($get('shipping') ?? 0);
+        $couponId = $get('coupon_id');
+        $discount = 0.0;
+
+        if (filled($couponId)) {
+            $coupon = Coupons::find($couponId);
+
+            if ($coupon) {
+                $discount = $coupon->discountFor($subtotal);
+                $set('coupon_code', $coupon->code);
+            }
+        } else {
+            $set('coupon_code', null);
+        }
+
+        $set('discount', $discount);
+        $set('total', self::calculateTotal($subtotal, $shipping, $discount));
+    }
+
+    private static function refreshTotal(Get $get, Set $set): void
+    {
+        $set('total', self::calculateTotal(
+            (float) ($get('subtotal') ?? 0),
+            (float) ($get('shipping') ?? 0),
+            (float) ($get('discount') ?? 0),
+        ));
+    }
+
+    private static function calculateTotal(float $subtotal, float $shipping, float $discount): float
+    {
+        return max(0, $subtotal + $shipping - $discount);
     }
 }

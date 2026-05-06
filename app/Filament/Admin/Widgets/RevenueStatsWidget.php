@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Widgets;
 
 use App\Models\Order;
 use App\Models\User;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +12,8 @@ use Illuminate\Support\Number;
 
 class RevenueStatsWidget extends BaseWidget
 {
+    use HasWidgetShield;
+
     protected static ?int $sort = 1;
 
     protected int|string|array $columnSpan = 'full';

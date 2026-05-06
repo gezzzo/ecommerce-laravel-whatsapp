@@ -3,12 +3,15 @@
 namespace App\Filament\Admin\Widgets;
 
 use App\Models\Order;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 class OrdersByStatusWidget extends BaseWidget
 {
+    use HasWidgetShield;
+
     protected static ?int $sort = 3;
 
     protected int|string|array $columnSpan = 'full';

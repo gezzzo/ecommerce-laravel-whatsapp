@@ -3,10 +3,12 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Middleware\CheckoutModeMiddleware;
 use Illuminate\Support\Facades\Route;
 
 // ==============================
@@ -55,17 +57,18 @@ Route::delete('/wishlist/{skuCode}', [WishlistController::class, 'remove'])->nam
 // الكوبون
 // ==============================
 Route::post('/coupon/apply', [CouponController::class, 'apply'])->name('coupon.apply');
+Route::delete('/coupon', [CouponController::class, 'destroy'])->name('coupon.destroy');
 
 // ==============================
 // الدفع — محمي بـ CheckoutModeMiddleware
 // ==============================
-Route::get('/checkout/confirmation/{order}', [\App\Http\Controllers\CheckoutController::class, 'confirmation'])
+Route::get('/checkout/confirmation/{order}', [CheckoutController::class, 'confirmation'])
     ->name('checkout.confirmation')
     ->middleware('signed');
 
-Route::middleware(\App\Http\Middleware\CheckoutModeMiddleware::class)->group(function () {
-    Route::get('/checkout', [\App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout');
-    Route::post('/checkout', [\App\Http\Controllers\CheckoutController::class, 'store'])->name('checkout.store');
+Route::middleware(CheckoutModeMiddleware::class)->group(function () {
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 });
 
 // ==============================
@@ -76,11 +79,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [AccountController::class, 'orders'])->name('orders');
 });
 
-
 Route::get('/switch-language', function () {
     $currentLocale = session('locale', 'ar');
     $newLocale = $currentLocale === 'ar' ? 'en' : 'ar';
     session(['locale' => $newLocale]);
+
     return back();
 })->name('switch-language');
 

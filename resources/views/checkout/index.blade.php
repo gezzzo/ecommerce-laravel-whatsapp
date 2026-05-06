@@ -216,6 +216,12 @@
                             @endif
                         </span>
                     </div>
+                    @if($discount > 0 && $appliedCoupon)
+                    <div class="flex justify-between text-green-600 font-medium">
+                        <span>الخصم ({{ $appliedCoupon->code }})</span>
+                        <span>-{{ number_format($discount) }} درهم</span>
+                    </div>
+                    @endif
                     <div class="text-xs text-green-600" id="free-shipping-hint">
                         @if($shippingConfig['mode'] === 'free')
                             🎁 شحن مجاني على جميع الطلبات
@@ -227,7 +233,7 @@
                     </div>
                     <div class="flex justify-between font-bold text-lg border-t border-gray-100 pt-2 mt-2">
                         <span>الإجمالي</span>
-                        <span class="text-primary-600" id="total-display">{{ number_format($subtotal) }} درهم</span>
+                        <span class="text-primary-600" id="total-display">{{ number_format(max(0, $subtotal - $discount)) }} درهم</span>
                     </div>
                 </div>
 
@@ -244,6 +250,7 @@
     // Define the component BEFORE Alpine loads
     const allDeliveryZones = {!! $deliveryZonesJson !!};
     const subtotalAmount = {{ $subtotal }};
+    const discountAmount = {{ $discount }};
     const shippingConfig = {!! json_encode($shippingConfig) !!};
 
     function calculateShipping(zoneFee) {
@@ -301,7 +308,7 @@
                 } else {
                     shippingEl.textContent = 'اختاري المدينة أولاً';
                 }
-                document.getElementById('total-display').textContent = Number(subtotalAmount).toLocaleString('ar-MA') + ' درهم';
+                document.getElementById('total-display').textContent = Number(Math.max(0, subtotalAmount - discountAmount)).toLocaleString('ar-MA') + ' درهم';
             },
 
             updateSummary(zoneFee) {
@@ -309,7 +316,7 @@
                 const totalEl = document.getElementById('total-display');
 
                 let shipping = calculateShipping(zoneFee);
-                let total = subtotalAmount + shipping;
+                let total = Math.max(0, subtotalAmount + shipping - discountAmount);
 
                 if (shipping === 0) {
                     shippingEl.innerHTML = '<span class="text-green-600 font-medium">✅ مجاني</span>';

@@ -106,6 +106,12 @@
                             {{ $shipping == 0 ? '✅ مجاني' : number_format($shipping) . ' درهم' }}
                         </span>
                     </div>
+                    @if($discount > 0 && $appliedCoupon)
+                    <div class="flex justify-between text-green-600 font-medium">
+                        <span>الخصم ({{ $appliedCoupon->code }})</span>
+                        <span>-{{ number_format($discount) }} درهم</span>
+                    </div>
+                    @endif
                     @if($shipping > 0)
                     <div class="bg-primary-50 text-primary-700 text-xs p-2 rounded-lg">
                         💡 أضف منتجات بقيمة {{ number_format(500 - $subtotal) }} درهم للحصول على شحن مجاني
@@ -122,7 +128,8 @@
                     @csrf
                     <div class="flex gap-2">
                         <input type="text" name="coupon" placeholder="كود الخصم"
-                               class="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                               value="{{ old('coupon', $appliedCoupon?->code) }}"
+                               class="flex-1 border @error('coupon') border-red-400 @else border-gray-200 @enderror rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
                                id="coupon-input"
                                aria-label="كود الخصم">
                         <button type="submit"
@@ -131,7 +138,19 @@
                             تطبيق
                         </button>
                     </div>
+                    @error('coupon')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </form>
+                @if($appliedCoupon)
+                <form action="{{ route('coupon.destroy') }}" method="POST" class="mt-2">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="text-xs text-gray-400 hover:text-red-500 transition-colors">
+                        حذف كود الخصم
+                    </button>
+                </form>
+                @endif
 
                 <a href="{{ route('checkout') }}"
                    class="mt-4 w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm"

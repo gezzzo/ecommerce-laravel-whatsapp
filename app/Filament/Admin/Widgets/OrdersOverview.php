@@ -6,6 +6,7 @@ use App\Enums\DeliveryStatusEnum;
 use App\Enums\OrderStatusEnum;
 use App\Filament\Admin\Resources\Orders\OrderResource;
 use App\Models\Order;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
@@ -13,6 +14,8 @@ use Livewire\Attributes\Reactive;
 
 class OrdersOverview extends BaseWidget
 {
+    use HasWidgetShield;
+
     protected static ?int $sort = 1;
 
     protected static bool $isLazy = false;

@@ -3,11 +3,14 @@
 namespace App\Filament\Admin\Widgets;
 
 use App\Models\Order;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
 
 class SalesTrendChartWidget extends ChartWidget
 {
+    use HasWidgetShield;
+
     protected static ?int $sort = 1;
 
     protected int|string|array $columnSpan = 'full';

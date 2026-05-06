@@ -3,12 +3,15 @@
 namespace App\Filament\Admin\Widgets;
 
 use App\Models\Order;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Number;
 
 class MonthlyComparisonWidget extends BaseWidget
 {
+    use HasWidgetShield;
+
     protected static ?int $sort = 5;
 
     protected int|string|array $columnSpan = 'full';

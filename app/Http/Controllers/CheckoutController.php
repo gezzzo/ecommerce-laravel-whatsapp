@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Coupons;
 use App\Models\DeliveryZone;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -42,19 +43,22 @@ class CheckoutController extends Controller
             ])->where('cart_id', $cart->id)->get()->map(function (CartItem $item) {
                 $skuable = $item->skuCode?->skuable;
                 if ($skuable instanceof Variant) {
-                    $item->displayName  = $skuable->product->name;
+                    $item->displayName = $skuable->product->name;
                     $item->displayPrice = $skuable->selling_price;
                 } elseif ($skuable instanceof Product) {
-                    $item->displayName  = $skuable->name;
+                    $item->displayName = $skuable->name;
                     $item->displayPrice = $skuable->selling_price;
                 }
 
                 return $item;
             });
 
-            $subtotal  = $cartItems->sum(fn (CartItem $item) => ($item->displayPrice ?? 0) * $item->quantity);
+            $subtotal = $cartItems->sum(fn (CartItem $item) => ($item->displayPrice ?? 0) * $item->quantity);
             $itemCount = $cartItems->sum('quantity');
         }
+
+        $appliedCoupon = $subtotal > 0 ? $this->appliedCoupon() : null;
+        $discount = $appliedCoupon?->discountFor((float) $subtotal) ?? 0;
 
         // Load visible delivery zones
         $deliveryZones = DeliveryZone::where('visible', true)
@@ -63,19 +67,19 @@ class CheckoutController extends Controller
             ->get();
 
         $deliveryZonesJson = $deliveryZones->map(fn (DeliveryZone $zone) => [
-            'id'           => $zone->id,
-            'city'         => $zone->city,
+            'id' => $zone->id,
+            'city' => $zone->city,
             'delivery_fee' => (float) $zone->delivery_fee,
-            'company'      => $zone->company?->name ?? '',
-            'company_id'   => $zone->delivery_company_id,
+            'company' => $zone->company?->name ?? '',
+            'company_id' => $zone->delivery_company_id,
         ])->toJson();
 
         // Shipping config for JS
         $shippingMode = StoreSetting::shippingMode();
         $shippingConfig = [
-            'mode'               => $shippingMode,
-            'free_threshold'     => (float) StoreSetting::get('free_shipping_threshold', 200),
-            'free_item_count'    => (int) StoreSetting::get('free_shipping_item_count', 3),
+            'mode' => $shippingMode,
+            'free_threshold' => (float) StoreSetting::get('free_shipping_threshold', 200),
+            'free_item_count' => (int) StoreSetting::get('free_shipping_item_count', 3),
             'current_item_count' => $itemCount,
         ];
 
@@ -86,7 +90,9 @@ class CheckoutController extends Controller
             'itemCount',
             'deliveryZones',
             'deliveryZonesJson',
-            'shippingConfig'
+            'shippingConfig',
+            'discount',
+            'appliedCoupon',
         ));
     }
 
@@ -97,12 +103,12 @@ class CheckoutController extends Controller
         ]);
 
         $validated = $request->validate([
-            'name'             => ['required', 'string', 'max:100'],
-            'phone'            => ['required', 'string', 'max:20'],
-            'address'          => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:100'],
+            'phone' => ['required', 'string', 'max:20'],
+            'address' => ['required', 'string', 'max:255'],
             'delivery_zone_id' => ['required', 'integer', 'exists:delivery_zones,id'],
-            'notes'            => ['nullable', 'string', 'max:500'],
-            'payment_method'   => ['nullable', 'string', 'in:cod'],
+            'notes' => ['nullable', 'string', 'max:500'],
+            'payment_method' => ['nullable', 'string', 'in:cod'],
         ]);
 
         $cart = $this->getCart();
@@ -131,32 +137,63 @@ class CheckoutController extends Controller
         });
 
         $itemCount = $cartItems->sum('quantity');
+        $coupon = null;
+
+        if (filled(session('coupon_code'))) {
+            $coupon = Coupons::query()
+                ->available()
+                ->where('code', session('coupon_code'))
+                ->first();
+
+            if (! $coupon) {
+                session()->forget('coupon_code');
+
+                return redirect()->route('cart')->with('error', 'كود الخصم لم يعد صالحاً.');
+            }
+        }
 
         // Use the centralized shipping calculator
         $deliveryZone = DeliveryZone::findOrFail($validated['delivery_zone_id']);
-        $shipping     = StoreSetting::calculateShipping($subtotal, $itemCount, (float) $deliveryZone->delivery_fee);
-        $total        = $subtotal + $shipping;
+        $shipping = StoreSetting::calculateShipping($subtotal, $itemCount, (float) $deliveryZone->delivery_fee);
+        $discount = $coupon?->discountFor((float) $subtotal) ?? 0;
 
-        $order = DB::transaction(function () use ($validated, $cart, $cartItems, $deliveryZone, $subtotal, $shipping, $total): Order {
+        $order = DB::transaction(function () use ($validated, $cart, $cartItems, $deliveryZone, $subtotal, $shipping, $discount, $coupon): Order {
             $customer = $this->resolveCheckoutCustomer($validated);
+            $lockedCoupon = null;
+
+            if ($coupon) {
+                $lockedCoupon = Coupons::query()
+                    ->whereKey($coupon->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $lockedCoupon?->isAvailable()) {
+                    $lockedCoupon = null;
+                }
+            }
+
+            $orderDiscount = $lockedCoupon ? $discount : 0;
+            $orderTotal = max(0, $subtotal + $shipping - $orderDiscount);
 
             $order = Order::create([
-                'user_id'             => $customer->id,
-                'order_number'        => 'ORD-' . strtoupper(uniqid()),
-                'name'                => $validated['name'],
-                'phone'               => $validated['phone'],
-                'address'             => $validated['address'],
-                'city'                => $deliveryZone->city,
-                'comment'             => $validated['notes'] ?? null,
-                'payment_method'      => $validated['payment_method'] ?? 'cod',
-                'payment_status'      => 'not_paid',
-                'delivery_status'     => 'pending',
-                'delivery_zone_id'    => $deliveryZone->id,
+                'user_id' => $customer->id,
+                'order_number' => 'ORD-'.strtoupper(uniqid()),
+                'name' => $validated['name'],
+                'phone' => $validated['phone'],
+                'address' => $validated['address'],
+                'city' => $deliveryZone->city,
+                'comment' => $validated['notes'] ?? null,
+                'payment_method' => $validated['payment_method'] ?? 'cod',
+                'payment_status' => 'not_paid',
+                'delivery_status' => 'pending',
+                'delivery_zone_id' => $deliveryZone->id,
                 'delivery_company_id' => $deliveryZone->delivery_company_id,
-                'subtotal'            => $subtotal,
-                'shipping'            => $shipping,
-                'discount'            => 0,
-                'total'               => $total,
+                'coupon_id' => $lockedCoupon?->id,
+                'subtotal' => $subtotal,
+                'shipping' => $shipping,
+                'discount' => $orderDiscount,
+                'total' => $orderTotal,
+                'coupon_code' => $lockedCoupon?->code,
             ]);
 
             foreach ($cartItems as $item) {
@@ -164,17 +201,21 @@ class CheckoutController extends Controller
                 OrderItem::create([
                     'order_id' => $order->id,
                     'sku_code' => $item->sku_code,
-                    'price'    => $skuable?->selling_price ?? 0,
+                    'price' => $skuable?->selling_price ?? 0,
                     'quantity' => $item->quantity,
                 ]);
             }
 
             CartItem::where('cart_id', $cart->id)->delete();
 
+            if ($lockedCoupon) {
+                $lockedCoupon->increment('used_count');
+            }
+
             return $order;
         });
 
-        session()->forget(['cart_count', 'cart_id']);
+        session()->forget(['cart_count', 'cart_id', 'coupon_code']);
 
         return redirect(URL::temporarySignedRoute(
             'checkout.confirmation',
@@ -215,7 +256,7 @@ class CheckoutController extends Controller
         $customer = User::firstOrCreate(
             ['phone' => $validated['phone']],
             [
-                'name'     => $validated['name'],
+                'name' => $validated['name'],
                 'password' => Hash::make(Str::password(32)),
                 'is_guest' => true,
             ]
@@ -242,5 +283,25 @@ class CheckoutController extends Controller
         }
 
         return null;
+    }
+
+    private function appliedCoupon(): ?Coupons
+    {
+        $couponCode = session('coupon_code');
+
+        if (! filled($couponCode)) {
+            return null;
+        }
+
+        $coupon = Coupons::query()
+            ->available()
+            ->where('code', $couponCode)
+            ->first();
+
+        if (! $coupon) {
+            session()->forget('coupon_code');
+        }
+
+        return $coupon;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Widgets;
 
 use App\Models\Coupons;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -10,6 +11,8 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 class CouponPerformanceWidget extends BaseWidget
 {
+    use HasWidgetShield;
+
     protected static ?int $sort = 3;
 
     protected int|string|array $columnSpan = 'half';

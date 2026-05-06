@@ -3,10 +3,13 @@
 namespace App\Filament\Admin\Widgets;
 
 use App\Models\Order;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Widgets\ChartWidget;
 
 class PaymentMethodChartWidget extends ChartWidget
 {
+    use HasWidgetShield;
+
     protected static ?int $sort = 4;
 
     protected int|string|array $columnSpan = 'half';
