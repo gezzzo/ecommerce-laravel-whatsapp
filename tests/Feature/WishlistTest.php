@@ -122,6 +122,62 @@ class WishlistTest extends TestCase
         ]);
     }
 
+    public function test_variant_product_requires_selected_variant_before_wishlist_add(): void
+    {
+        [$product, $variant, $skuCode] = $this->createVariantWithSku();
+
+        $response = $this
+            ->from(route('product', $product->slug))
+            ->post(route('wishlist.add'), [
+                'product_id' => $product->id,
+            ]);
+
+        $response->assertRedirect(route('product', $product->slug));
+        $response->assertSessionHas('error', 'يرجى اختيار اللون/المقاس أولاً.');
+
+        $this->assertDatabaseMissing('wishlist_items', [
+            'sku_code' => $skuCode->id,
+        ]);
+    }
+
+    public function test_adding_wishlist_item_to_cart_removes_it_from_wishlist(): void
+    {
+        [$product, $skuCode] = $this->createProductWithSku();
+
+        $wishlist = Wishlist::create([
+            'session_id' => Str::uuid()->toString(),
+        ]);
+
+        WishlistItem::create([
+            'wishlist_id' => $wishlist->id,
+            'sku_code' => $skuCode->id,
+        ]);
+
+        $response = $this
+            ->withSession(['wishlist_id' => $wishlist->id])
+            ->from(route('wishlist'))
+            ->post(route('cart.add'), [
+                'product_id' => $product->id,
+                'quantity' => 1,
+            ]);
+
+        $response->assertRedirect(route('wishlist'));
+        $response->assertSessionHas('success', 'تمت الإضافة إلى السلة بنجاح!');
+        $response->assertSessionHas('wishlist_count', 0);
+        $response->assertSessionHas('wishlist_sku_codes', []);
+        $response->assertSessionHas('cart_count', 1);
+
+        $this->assertDatabaseHas('cart_items', [
+            'sku_code' => $skuCode->id,
+            'quantity' => 1,
+        ]);
+
+        $this->assertDatabaseMissing('wishlist_items', [
+            'wishlist_id' => $wishlist->id,
+            'sku_code' => $skuCode->id,
+        ]);
+    }
+
     /**
      * @return array{Product, SkuCode}
      */
@@ -132,7 +188,7 @@ class WishlistTest extends TestCase
         $product = Product::create([
             'category_id' => $category->id,
             'name' => 'عباية اختبار',
-            'slug' => 'wishlist-product-' . Str::random(8),
+            'slug' => 'wishlist-product-'.Str::random(8),
             'description' => 'Test product',
             'selling_price' => 150,
             'thumbnail' => 'products/thumb.jpg',
@@ -150,7 +206,7 @@ class WishlistTest extends TestCase
         $skuCode = SkuCode::create([
             'skuable_type' => Product::class,
             'skuable_id' => $product->id,
-            'sku_code' => 'SKU-' . Str::upper(Str::random(8)),
+            'sku_code' => 'SKU-'.Str::upper(Str::random(8)),
         ]);
 
         return [$product, $skuCode];
@@ -166,7 +222,7 @@ class WishlistTest extends TestCase
         $product = Product::create([
             'category_id' => $category->id,
             'name' => 'عباية خيارات',
-            'slug' => 'wishlist-variant-product-' . Str::random(8),
+            'slug' => 'wishlist-variant-product-'.Str::random(8),
             'description' => 'Test variant product',
             'selling_price' => 200,
             'thumbnail' => 'products/thumb.jpg',
@@ -204,7 +260,7 @@ class WishlistTest extends TestCase
         $skuCode = SkuCode::create([
             'skuable_type' => Variant::class,
             'skuable_id' => $variant->id,
-            'sku_code' => 'SKU-' . Str::upper(Str::random(8)),
+            'sku_code' => 'SKU-'.Str::upper(Str::random(8)),
         ]);
 
         return [$product, $variant, $skuCode];
@@ -214,7 +270,7 @@ class WishlistTest extends TestCase
     {
         return Category::create([
             'name' => 'ملابس المحجبات',
-            'slug' => 'category-' . Str::random(8),
+            'slug' => 'category-'.Str::random(8),
         ]);
     }
 }

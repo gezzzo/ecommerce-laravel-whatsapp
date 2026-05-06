@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'إتمام الطلب - متجري')
-@section('meta_description', 'أتم طلبك بأمان. شحن سريع وإرجاع مجاني.')
+@section('title', 'إتمام الطلب - Mohtachima')
+@section('meta_description', 'أتمي طلبك بأمان. شحن سريع لجميع المدن المغربية.')
 
 @push('styles')
 <style>[x-cloak] { display: none !important; }</style>
@@ -28,14 +28,14 @@
             {{-- ===== MODE: OPTIONAL — Show Login/Guest choice ===== --}}
             @if($mode === 'optional' && !auth()->check())
             <div class="bg-white rounded-2xl border border-gray-100 p-6 mb-6" x-data="{ tab: 'guest' }">
-                <h2 class="font-bold text-gray-900 mb-4 text-lg">كيف تريد المتابعة؟</h2>
+                <h2 class="font-bold text-gray-900 mb-4 text-lg">كيف تريدين المتابعة؟</h2>
                 <div class="grid md:grid-cols-2 gap-4">
                     <button type="button" x-on:click="tab='guest'"
                             :class="tab==='guest' ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-gray-200 text-gray-600'"
                             class="border-2 rounded-xl p-4 text-right transition-all" id="checkout-guest-tab">
                         <div class="text-2xl mb-2">📦</div>
-                        <div class="font-semibold">متابعة كضيف</div>
-                        <div class="text-xs mt-1 opacity-70">أدخل بيانات الشحن فقط</div>
+                        <div class="font-semibold">متابعة كضيفة</div>
+                        <div class="text-xs mt-1 opacity-70">أدخلي بيانات الشحن فقط</div>
                     </button>
 
                     <button type="button" x-on:click="tab='login'"
@@ -99,7 +99,7 @@
                                        x-model="search"
                                        x-on:focus="open = true"
                                        x-on:input="open = true"
-                                       placeholder="ابحث عن مدينتك..."
+                                       placeholder="ابحثي عن مدينتك..."
                                        autocomplete="off"
                                        class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 @error('delivery_zone_id') border-red-400 @enderror"
                                        id="checkout-city-search">
@@ -167,7 +167,7 @@
                             <input type="radio" name="payment_method" value="cod" checked class="accent-primary-600">
                             <div>
                                 <div class="font-medium text-sm">الدفع عند الاستلام</div>
-                                <div class="text-xs text-gray-400">ادفع نقداً لدى التسليم</div>
+                                <div class="text-xs text-gray-400">ادفعي نقداً لدى التسليم</div>
                             </div>
                             <span class="mr-auto text-2xl">💵</span>
                         </label>
@@ -212,7 +212,7 @@
                             @if($shippingConfig['mode'] === 'free')
                                 <span class="text-green-600 font-medium">✅ مجاني</span>
                             @else
-                                اختر المدينة أولاً
+                                اختاري المدينة أولاً
                             @endif
                         </span>
                     </div>
@@ -299,7 +299,7 @@
                 if (shippingConfig.mode === 'free') {
                     shippingEl.innerHTML = '<span class="text-green-600 font-medium">✅ مجاني</span>';
                 } else {
-                    shippingEl.textContent = 'اختر المدينة أولاً';
+                    shippingEl.textContent = 'اختاري المدينة أولاً';
                 }
                 document.getElementById('total-display').textContent = Number(subtotalAmount).toLocaleString('ar-MA') + ' درهم';
             },

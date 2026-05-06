@@ -21,9 +21,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- SEO Meta Tags --}}
-    <title>@yield('title', $siteName . ' - تسوق أفضل المنتجات')</title>
-    <meta name="description" content="@yield('meta_description', $siteName . ' - متجرك الإلكتروني الأول لأفضل المنتجات بأسعار منافسة وشحن سريع للمغرب العربي. عروض يومية وخصومات حصرية.')">
-    <meta name="keywords" content="@yield('meta_keywords', 'تسوق, منتجات, عروض, خصومات, شحن مجاني, متجر إلكتروني, المغرب العربي')">
+    <title>@yield('title', $siteName . ' - ملابس نسائية مغربية راقية')</title>
+    <meta name="description" content="@yield('meta_description', $siteName . ' - متجرك الأول في المغرب لأرقى الملابس النسائية والمحجبات، جلابة مغربية، فساتين وعبايات. جودة عالية بأسعار مناسبة مع شحن سريع لجميع مدن المغرب.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'ملابس نسائية, أزياء مغربية, جلابة مغربية, ملابس محجبات, فساتين, تسوق ملابس, المغرب, قفطان, عبايات, Mohtachima')">
     <meta name="robots" content="index, follow">
     <meta name="author" content="{{ $siteName }}">
     <link rel="canonical" href="{{ url()->current() }}">
@@ -31,16 +31,16 @@
     {{-- Open Graph --}}
     <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="@yield('og_title', $siteName)">
-    <meta property="og:description" content="@yield('meta_description', $siteName . ' - أفضل المنتجات بأسعار منافسة وشحن سريع')">
+    <meta property="og:title" content="@yield('og_title', $siteName . ' - ملابس نسائية مغربية')">
+    <meta property="og:description" content="@yield('meta_description', $siteName . ' - متجرك الأول في المغرب لأرقى الملابس النسائية والمحجبات. شحن سريع لجميع المدن.')">
     <meta property="og:image" content="@yield('og_image', asset('images/og-default.png'))">
     <meta property="og:locale" content="ar_MA">
     <meta property="og:site_name" content="{{ $siteName }}">
 
     {{-- Twitter Card --}}
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('og_title', $siteName)">
-    <meta name="twitter:description" content="@yield('meta_description', $siteName . ' - أفضل المنتجات بأسعار منافسة وشحن سريع')">
+    <meta name="twitter:title" content="@yield('og_title', $siteName . ' - ملابس نسائية مغربية')">
+    <meta name="twitter:description" content="@yield('meta_description', $siteName . ' - متجرك الأول في المغرب لأرقى الملابس النسائية والمحجبات. شحن سريع لجميع المدن.')">
     <meta name="twitter:image" content="@yield('og_image', asset('images/og-default.png'))">
 
     @if(filled($siteMetaPixelId))

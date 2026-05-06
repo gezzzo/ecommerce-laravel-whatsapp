@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', $product->name . ' - متجري')
+@section('title', $product->name . ' - Mohtachima')
 @section('meta_description', Str::limit(strip_tags($product->description), 160))
-@section('meta_keywords', $product->name . ', ' . ($product->category->name ?? '') . ', شراء, متجري')
+@section('meta_keywords', $product->name . ', ' . ($product->category->name ?? '') . ', جلابة, قفطان, ملابس نسائية, المغرب, Mohtachima')
 @section('og_type', 'product')
-@section('og_title', $product->name . ' - متجري')
+@section('og_title', $product->name . ' - Mohtachima')
 @section('og_image', asset('storage/' . $product->thumbnail))
 
 @push('structured_data')
@@ -18,7 +18,7 @@
     "sku": "{{ $product->skuCode?->sku_code ?? $product->slug }}",
     "brand": {
         "@@type": "Brand",
-        "name": "{{ config('app.name', 'متجري') }}"
+        "name": "Mohtachima"
     },
     "category": "{{ $product->category->name ?? '' }}",
     "offers": {
@@ -29,7 +29,7 @@
         "url": "{{ url()->current() }}",
         "seller": {
             "@@type": "Organization",
-            "name": "{{ config('app.name', 'متجري') }}"
+            "name": "Mohtachima"
         }
     }
 }
@@ -104,7 +104,7 @@
     // Gather all thumbnails including variant colors
     $allThumbnails = collect();
     $allThumbnails->push((object)['url' => asset('storage/' . $product->thumbnail), 'color_id' => null]);
-    
+
     foreach ($product->images as $img) {
         $imgUrl = asset('storage/' . $img->image);
         if (!$allThumbnails->contains('url', $imgUrl)) {
@@ -140,7 +140,7 @@
             }
         }
     }
-    
+
     $allThumbnails = $filteredThumbnails;
 
     $stockQty = $product->has_variants ? null : ($product->inventory?->quantity ?? 0);
@@ -402,15 +402,17 @@
                     <input type="hidden" name="product_id" value="{{ $product->id }}">
                     <input type="hidden" name="variant_id" id="selectedWishlistVariantId" value="">
                     <button type="submit"
-                            class="w-full border border-gray-200 rounded-xl flex items-center justify-center gap-2 py-2.5 text-gray-500 hover:text-red-500 hover:border-red-200 transition-colors text-sm">
+                            id="wishlistBtn"
+                            @disabled($product->has_variants)
+                            class="w-full border border-gray-200 rounded-xl flex items-center justify-center gap-2 py-2.5 text-gray-500 hover:text-red-500 hover:border-red-200 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-                        أضف للمفضلة
+                        <span id="wishlistText">{{ $product->has_variants ? $variantSelectionPrompt : 'أضف للمفضلة' }}</span>
                     </button>
                 </form>
 
                 {{-- Guarantees --}}
                 <div class="grid grid-cols-3 gap-3 mt-6 pt-6 border-t border-gray-100">
-                    @foreach([['🚚','شحن سريع','لجميع المحافظات'],['🔄','إرجاع مجاني','خلال 30 يوم'],['🔒','دفع آمن','100% مضمون']] as $g)
+                    @foreach([['🚚','شحن سريع','لجميع المدن'],['🔄','إرجاع سهل','خلال 7 أيام'],['🔒','دفع آمن','100% مضمون']] as $g)
                     <div class="text-center">
                         <div class="text-xl mb-1">{{ $g[0] }}</div>
                         <div class="text-xs font-medium text-gray-700">{{ $g[1] }}</div>
@@ -484,6 +486,19 @@
         });
     }
 
+    function setWishlistState(isDisabled, text) {
+        const button = document.getElementById('wishlistBtn');
+        const label = document.getElementById('wishlistText');
+
+        if (button) {
+            button.disabled = isDisabled;
+        }
+
+        if (label) {
+            label.textContent = text;
+        }
+    }
+
     function selectSize(el) {
         document.querySelectorAll('.size-btn').forEach(s => {
             s.classList.remove('active', 'border-primary-500', 'bg-primary-50', 'text-primary-700');
@@ -508,6 +523,7 @@
             document.getElementById('selectedVariantId').value = '';
             document.getElementById('selectedWishlistVariantId').value = '';
             setAddToCartState(true, 'اختر اللون');
+            setWishlistState(true, 'اختر اللون');
         } else {
             // No colors — match variant directly by size only
             matchVariant();
@@ -621,11 +637,13 @@
                 stockEl.className = 'bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full';
                 stockEl.textContent = 'متوفر في المخزون (' + matched.stock + ')';
                 setAddToCartState(false, 'أضف للسلة');
+                setWishlistState(false, 'أضف للمفضلة');
                 document.getElementById('qty').max = matched.stock;
             } else {
                 stockEl.className = 'bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full';
                 stockEl.textContent = 'غير متوفر حالياً';
                 setAddToCartState(true, 'غير متوفر');
+                setWishlistState(true, 'غير متوفر');
             }
 
             const skuEl = document.getElementById('skuDisplay');
@@ -636,6 +654,7 @@
             document.getElementById('selectedVariantId').value = '';
             document.getElementById('selectedWishlistVariantId').value = '';
             setAddToCartState(true, hasSizes ? 'اختر المقاس واللون' : 'اختر اللون');
+            setWishlistState(true, hasSizes ? 'اختر المقاس واللون' : 'اختر اللون');
         }
     }
 

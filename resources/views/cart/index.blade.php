@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'سلة التسوق - متجري')
-@section('meta_description', 'سلة التسوق - راجع منتجاتك وأتم عملية الشراء بأمان. شحن سريع وإرجاع مجاني.')
+@section('title', 'سلة التسوق - Mohtachima')
+@section('meta_description', 'سلة التسوق - راجعي منتجاتك وأتمي عملية الشراء بأمان. شحن سريع لجميع المدن.')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
@@ -108,7 +108,7 @@
                     </div>
                     @if($shipping > 0)
                     <div class="bg-primary-50 text-primary-700 text-xs p-2 rounded-lg">
-                        💡 أضف منتجات بقيمة {{ number_format(200 - $subtotal) }} درهم للحصول على شحن مجاني
+                        💡 أضف منتجات بقيمة {{ number_format(500 - $subtotal) }} درهم للحصول على شحن مجاني
                     </div>
                     @endif
                     <div class="border-t border-gray-100 pt-3 flex justify-between font-bold text-lg">
@@ -152,11 +152,11 @@
             <svg class="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
         </div>
         <h2 class="text-xl font-bold text-gray-800 mb-2">سلتك فارغة!</h2>
-        <p class="text-gray-500 mb-6">لم تضف أي منتجات بعد. استعرض منتجاتنا وأضف ما يعجبك.</p>
+        <p class="text-gray-500 mb-6">لم تضيفي أي منتجات بعد. استعرضي منتجاتنا وأضيفي ما يعجبك.</p>
         <a href="{{ route('products') }}"
            class="inline-block bg-primary-600 hover:bg-primary-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors"
            id="empty-cart-shop">
-            تسوق الآن
+            تسوقي الآن
         </a>
     </div>
     @endif

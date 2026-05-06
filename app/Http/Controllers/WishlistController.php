@@ -44,7 +44,14 @@ class WishlistController extends Controller
             'variant_id' => ['nullable', 'integer', 'exists:variants,id'],
         ]);
 
-        $skuCode = $this->resolveSkuCode($validated);
+        $product = Product::with(['skuCode', 'variants.skuCode'])
+            ->findOrFail($validated['product_id']);
+
+        if ($product->has_variants && empty($validated['variant_id'])) {
+            return back()->with('error', 'يرجى اختيار اللون/المقاس أولاً.');
+        }
+
+        $skuCode = $this->resolveSkuCode($product, $validated['variant_id'] ?? null);
 
         if (! $skuCode) {
             return back()->with('error', 'المنتج غير متوفر حالياً.');
@@ -86,28 +93,13 @@ class WishlistController extends Controller
         return back()->with('success', 'تم حذف المنتج من المفضلة.');
     }
 
-    /**
-     * @param  array{product_id: int, variant_id?: int|null}  $validated
-     */
-    private function resolveSkuCode(array $validated): ?SkuCode
+    private function resolveSkuCode(Product $product, ?int $variantId): ?SkuCode
     {
-        $product = Product::with(['skuCode', 'variants.skuCode'])
-            ->findOrFail($validated['product_id']);
-
-        if (! empty($validated['variant_id'])) {
-            $variant = $product->variants()
-                ->with('skuCode')
-                ->whereKey($validated['variant_id'])
-                ->first();
+        if ($variantId !== null) {
+            $variant = $product->variants
+                ->first(fn (Variant $variant): bool => $variant->id === $variantId);
 
             return $variant?->skuCode;
-        }
-
-        if ($product->has_variants) {
-            return $product->variants
-                ->sortBy('id')
-                ->first(fn (Variant $variant): bool => $variant->skuCode !== null)
-                ?->skuCode;
         }
 
         return $product->skuCode;

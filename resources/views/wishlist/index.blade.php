@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'المفضلة - متجري')
-@section('meta_description', 'منتجاتك المفضلة في متجري. احفظ المنتجات التي تعجبك وارجع لها لاحقاً بسهولة.')
+@section('title', 'المفضلة - Mohtachima')
+@section('meta_description', 'منتجاتك المفضلة في Mohtachima. احفظي المنتجات التي تعجبك وارجعي لها لاحقاً بسهولة.')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
@@ -89,7 +89,7 @@
             <svg class="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
         </div>
         <h2 class="text-xl font-bold text-gray-800 mb-2">المفضلة فارغة!</h2>
-        <p class="text-gray-500 mb-6">اضغط على القلب في أي منتج لحفظه هنا.</p>
+        <p class="text-gray-500 mb-6">اضغطي على القلب في أي منتج لحفظه هنا.</p>
         <a href="{{ route('products') }}"
            class="inline-block bg-primary-600 hover:bg-primary-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors">
             تصفح المنتجات

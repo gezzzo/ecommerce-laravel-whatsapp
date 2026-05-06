@@ -7,6 +7,8 @@ use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\SkuCode;
 use App\Models\Variant;
+use App\Models\Wishlist;
+use App\Models\WishlistItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -75,27 +77,15 @@ class CartController extends Controller
 
         $quantity = $validated['quantity'] ?? 1;
 
-        // If product has variants, variant_id is required
-        $product = Product::findOrFail($validated['product_id']);
+        $product = Product::with(['skuCode', 'variants.skuCode'])
+            ->findOrFail($validated['product_id']);
 
         if ($product->has_variants && empty($validated['variant_id'])) {
             return back()->with('error', 'يرجى اختيار اللون/المقاس أولاً.');
         }
 
         $cart = $this->getOrCreateCart();
-
-        /** @var SkuCode|null $skuCode */
-        $skuCode = null;
-
-        if (! empty($validated['variant_id'])) {
-            $skuCode = SkuCode::where('skuable_type', Variant::class)
-                ->where('skuable_id', $validated['variant_id'])
-                ->first();
-        } else {
-            $skuCode = SkuCode::where('skuable_type', Product::class)
-                ->where('skuable_id', $validated['product_id'])
-                ->first();
-        }
+        $skuCode = $this->resolveSkuCode($product, $validated['variant_id'] ?? null);
 
         if (! $skuCode) {
             return back()->with('error', 'المنتج غير متوفر حالياً.');
@@ -118,6 +108,7 @@ class CartController extends Controller
         }
 
         session(['cart_count' => CartItem::where('cart_id', $cart->id)->sum('quantity')]);
+        $this->removeFromWishlist($skuCode);
 
         return back()->with('success', 'تمت الإضافة إلى السلة بنجاح!');
     }
@@ -182,5 +173,76 @@ class CartController extends Controller
         session(['cart_id' => $cart->id]);
 
         return $cart;
+    }
+
+    private function resolveSkuCode(Product $product, ?int $variantId): ?SkuCode
+    {
+        if ($variantId !== null) {
+            $variant = $product->variants
+                ->first(fn (Variant $variant): bool => $variant->id === $variantId);
+
+            return $variant?->skuCode;
+        }
+
+        return $product->skuCode;
+    }
+
+    private function removeFromWishlist(SkuCode $skuCode): void
+    {
+        $wishlist = $this->currentWishlist();
+
+        if (! $wishlist) {
+            return;
+        }
+
+        WishlistItem::where('wishlist_id', $wishlist->id)
+            ->where('sku_code', $skuCode->id)
+            ->delete();
+
+        $this->syncWishlistSession($wishlist);
+    }
+
+    private function currentWishlist(): ?Wishlist
+    {
+        if (auth()->check()) {
+            return Wishlist::where('user_id', auth()->id())->first();
+        }
+
+        $sessionWishlistId = session('wishlist_id');
+
+        if ($sessionWishlistId) {
+            $wishlist = Wishlist::find($sessionWishlistId);
+
+            if ($wishlist) {
+                return $wishlist;
+            }
+        }
+
+        $sessionId = session()->getId();
+
+        if (! $sessionId) {
+            return null;
+        }
+
+        $wishlist = Wishlist::where('session_id', $sessionId)->first();
+
+        if ($wishlist) {
+            session(['wishlist_id' => $wishlist->id]);
+        }
+
+        return $wishlist;
+    }
+
+    private function syncWishlistSession(Wishlist $wishlist): void
+    {
+        $skuCodes = WishlistItem::where('wishlist_id', $wishlist->id)
+            ->pluck('sku_code')
+            ->map(fn ($skuCode): int => (int) $skuCode)
+            ->all();
+
+        session([
+            'wishlist_count' => count($skuCodes),
+            'wishlist_sku_codes' => $skuCodes,
+        ]);
     }
 }

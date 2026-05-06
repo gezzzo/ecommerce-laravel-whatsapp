@@ -150,7 +150,6 @@ class OrderWhatsappConfirmationService
             $latestTracking?->situation_name ? "الوضع الحالي: {$latestTracking->situation_name}" : null,
             $latestTracking?->time ? 'وقت التحديث: '.$latestTracking->time->format('Y-m-d H:i') : null,
             'الإجمالي: '.Number::format((float) $order->total, 2).' درهم',
-            $order->tracking_number ? null : 'سنرسل لك رقم الشحنة بمجرد تسليم الطلب لشركة الشحن.',
         ]));
     }
 

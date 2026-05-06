@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'تأكيد الطلب عبر واتساب - متجري')
-@section('meta_description', 'أكد طلبك عبر واتساب حتى نبدأ تجهيز الشحن.')
+@section('title', 'تأكيد الطلب عبر واتساب - Mohtachima')
+@section('meta_description', 'أكدي طلبك عبر واتساب حتى نبدأ تجهيز الشحن السريع لكِ.')
 
 @section('content')
 <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10">
@@ -10,13 +10,13 @@
             <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                 <div>
                     <div class="inline-flex items-center gap-2 bg-green-50 text-green-700 rounded-full px-3 py-1 text-sm font-semibold mb-4">
-                        ✅ تم إنشاء الطلب
+                        ✅ تم إنشاء الطلب بنجاح
                     </div>
                     <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
-                        أكد طلبك من واتساب
+                        أكدي طلبك عبر الواتساب
                     </h1>
                     <p class="text-gray-500 leading-7">
-                        اضغط على زر واتساب وسيتم فتح رسالة جاهزة لتأكيد الطلب. بعد إرسالها سنحفظ رقم واتساب على الطلب ونرسل لك تفاصيل الطلب في المحادثة، ويمكنك إرسال كود الطلب لاحقاً لتتبع الأوردر.
+                        اضغطي على زر الواتساب وسيتم فتح رسالة جاهزة لتأكيد الطلب. بعد إرسالها سنبدأ فوراً بتجهيز طلبك من Mohtachima.
                     </p>
                 </div>
 
@@ -42,7 +42,7 @@
                            target="_blank"
                            rel="noopener"
                            class="mt-4 inline-flex w-full sm:w-auto items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-xl transition-colors">
-                            فتح واتساب وتأكيد الطلب
+                            تأكيد الطلب عبر واتساب
                         </a>
                     @else
                         <div class="mt-4 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-xl p-4 text-sm">

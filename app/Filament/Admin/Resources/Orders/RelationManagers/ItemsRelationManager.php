@@ -2,6 +2,9 @@
 
 namespace App\Filament\Admin\Resources\Orders\RelationManagers;
 
+use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\Variant;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -13,7 +16,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class ItemsRelationManager extends RelationManager
 {
@@ -57,30 +62,25 @@ class ItemsRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('name')
+            ->modifyQueryUsing(fn (Builder $query) => $query->with([
+                'skuCode.skuable' => fn (MorphTo $morphTo) => $morphTo->morphWith([
+                    Product::class => ['category'],
+                    Variant::class => ['product.category', 'size', 'color'],
+                ]),
+            ]))
             ->columns([
-                ImageColumn::make('image')
+                ImageColumn::make('product_image')
                     ->label(__('Image'))
                     ->circular()
-                    ->getStateUsing(function (Model $record) {
-                        $skuable = $record->skuCode?->skuable;
-                        if ($skuable instanceof \App\Models\ProductVariant) {
-                            return $skuable->image ?? $skuable->product?->thumbnail;
-                        }
-                        return $skuable?->thumbnail;
-                    }),
-                TextColumn::make('name')
+                    ->state(fn (OrderItem $record): ?string => $this->productImage($record)),
+                TextColumn::make('product_name')
                     ->label(__('Name'))
-                    ->getStateUsing(function (Model $record) {
-                        $skuable = $record->skuCode?->skuable;
-                        if ($skuable instanceof \App\Models\ProductVariant) {
-                            $parts = array_filter([$skuable->color?->name, $skuable->size?->name]);
-                            $suffix = count($parts) > 0 ? ' (' . implode(' - ', $parts) . ')' : '';
-                            return $skuable->product?->name . $suffix;
-                        }
-                        return $skuable?->name;
-                    }),
+                    ->state(fn (OrderItem $record): string => $this->productName($record))
+                    ->description(fn (OrderItem $record): ?string => $this->variantDescription($record))
+                    ->searchable(false),
                 TextColumn::make('sku_code')
-                    ->label(__('SKU')),
+                    ->label(__('SKU'))
+                    ->state(fn (OrderItem $record): string => $record->skuCode?->sku_code ?? (string) $record->sku_code),
                 TextColumn::make('quantity')
                     ->label(__('Quantity'))
                     ->numeric(),
@@ -106,5 +106,51 @@ class ItemsRelationManager extends RelationManager
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    private function productImage(OrderItem $record): ?string
+    {
+        $skuable = $record->skuCode?->skuable;
+
+        if ($skuable instanceof Variant) {
+            return $skuable->image ?: $skuable->product?->thumbnail;
+        }
+
+        if ($skuable instanceof Product) {
+            return $skuable->thumbnail;
+        }
+
+        return null;
+    }
+
+    private function productName(OrderItem $record): string
+    {
+        $skuable = $record->skuCode?->skuable;
+
+        if ($skuable instanceof Variant) {
+            return $skuable->product?->name ?? __('Product unavailable');
+        }
+
+        if ($skuable instanceof Product) {
+            return $skuable->name;
+        }
+
+        return __('Product unavailable');
+    }
+
+    private function variantDescription(OrderItem $record): ?string
+    {
+        $skuable = $record->skuCode?->skuable;
+
+        if (! $skuable instanceof Variant) {
+            return null;
+        }
+
+        $parts = collect([
+            $skuable->color?->name,
+            $skuable->size?->name,
+        ])->filter();
+
+        return $parts->isNotEmpty() ? $parts->implode(' / ') : null;
     }
 }

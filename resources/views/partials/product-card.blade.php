@@ -6,13 +6,10 @@
     $isInStock = $product->has_variants ? true : $stockQty > 0;
     $variantsCount = $product->relationLoaded('variants') ? $product->variants->count() : ($product->variants_count ?? 0);
     $wishlistSkuCodes = collect($wishlistSkuCodes ?? session('wishlist_sku_codes', []))->map(fn ($skuCode) => (int) $skuCode);
-    $primaryWishlistVariant = $product->has_variants && $product->relationLoaded('variants')
-        ? $product->variants->sortBy('id')->first()
-        : null;
-    $primaryWishlistSkuCode = $product->has_variants
-        ? $primaryWishlistVariant?->skuCode?->id
-        : ($product->relationLoaded('skuCode') ? $product->skuCode?->id : null);
-    $isWishlisted = $primaryWishlistSkuCode && $wishlistSkuCodes->contains((int) $primaryWishlistSkuCode);
+    $productWishlistSkuCodes = $product->has_variants && $product->relationLoaded('variants')
+        ? $product->variants->pluck('skuCode.id')->filter()->map(fn ($skuCode) => (int) $skuCode)
+        : collect([$product->relationLoaded('skuCode') ? $product->skuCode?->id : null])->filter()->map(fn ($skuCode) => (int) $skuCode);
+    $isWishlisted = $productWishlistSkuCodes->intersect($wishlistSkuCodes)->isNotEmpty();
 @endphp
 
 <article class="bg-white rounded-2xl border border-gray-100 overflow-hidden card-hover group" itemscope itemtype="https://schema.org/Product">
@@ -44,12 +41,19 @@
         @endif
 
         {{-- Wishlist --}}
+        @if($product->has_variants)
+        <a href="{{ route('product', $product->slug) }}"
+           class="absolute top-2 left-2 w-7 h-7 backdrop-blur rounded-full flex items-center justify-center shadow transition-colors {{ $isWishlisted ? 'bg-primary-600 text-white hover:bg-primary-700' : 'bg-white/90 text-gray-400 hover:text-red-500' }}"
+           aria-label="اختر اللون والمقاس لإضافة {{ $product->name }} للمفضلة"
+           title="اختر اللون والمقاس أولاً">
+            <svg class="w-4 h-4" fill="{{ $isWishlisted ? 'currentColor' : 'none' }}" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+        </a>
+        @else
         <form action="{{ route('wishlist.add') }}" method="POST" class="absolute top-2 left-2">
             @csrf
             <input type="hidden" name="product_id" value="{{ $product->id }}">
-            @if($primaryWishlistVariant)
-            <input type="hidden" name="variant_id" value="{{ $primaryWishlistVariant->id }}">
-            @endif
             <button type="submit"
                     class="w-7 h-7 backdrop-blur rounded-full flex items-center justify-center shadow transition-colors {{ $isWishlisted ? 'bg-primary-600 text-white hover:bg-primary-700' : 'bg-white/90 text-gray-400 hover:text-red-500' }}"
                     aria-label="{{ $isWishlisted ? 'حذف ' . $product->name . ' من المفضلة' : 'إضافة ' . $product->name . ' للمفضلة' }}"
@@ -59,6 +63,7 @@
                 </svg>
             </button>
         </form>
+        @endif
     </div>
 
     <div class="p-3">

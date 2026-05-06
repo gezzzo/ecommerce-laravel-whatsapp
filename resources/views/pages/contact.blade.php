@@ -16,7 +16,7 @@
 @endphp
 
 @section('title', 'تواصل معنا - ' . $pageStoreName)
-@section('meta_description', 'تواصل مع فريق خدمة عملاء ' . $pageStoreName . '. نحن هنا لمساعدتك.')
+@section('meta_description', 'تواصل مع فريق خدمة عملاء ' . $pageStoreName . '. نحن هنا لمساعدتك في كل ما يخص ملابس النساء المغربية.')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
@@ -83,7 +83,7 @@
         </div>
 
         <div class="bg-gray-900 text-white rounded-2xl p-6 sm:p-8">
-            <h2 class="text-xl font-bold mb-4">تابعنا</h2>
+            <h2 class="text-xl font-bold mb-4">تابعينا</h2>
             <p class="text-gray-300 text-sm leading-relaxed mb-6">
                 روابط التواصل الاجتماعي يتم تعديلها من لوحة التحكم ضمن إعدادات المتجر.
             </p>
