@@ -2,7 +2,11 @@
 
 namespace App\Filament\Admin\Resources\WhatsappInbox\Tables;
 
+use App\Models\WhatsappInboxMessage;
+use App\Services\WhatsappInboxReplyService;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Textarea;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -100,10 +104,41 @@ class WhatsappInboxTable
                     ->label(__('Reply'))
                     ->icon('heroicon-o-paper-airplane')
                     ->color('success')
-                    ->url(fn ($record) => route('filament.admin.resources.whatsapp-campaigns.create', [
+                    ->modalHeading(fn (WhatsappInboxMessage $record): string => __('Reply to :phone', [
                         'phone' => $record->from,
                     ]))
-                    ->openUrlInNewTab(),
+                    ->modalDescription(__('This will send one WhatsApp message directly without creating a campaign.'))
+                    ->form([
+                        Textarea::make('message')
+                            ->label(__('Reply message'))
+                            ->required()
+                            ->rows(5)
+                            ->maxLength(4000)
+                            ->placeholder(__('Write your reply here...'))
+                            ->columnSpanFull(),
+                    ])
+                    ->modalSubmitActionLabel(__('Send Reply'))
+                    ->action(function (WhatsappInboxMessage $record, array $data): void {
+                        $result = app(WhatsappInboxReplyService::class)->reply(
+                            inboxMessage: $record,
+                            message: $data['message'] ?? '',
+                        );
+
+                        if ($result['success']) {
+                            Notification::make()
+                                ->title(__('Reply sent successfully.'))
+                                ->success()
+                                ->send();
+
+                            return;
+                        }
+
+                        Notification::make()
+                            ->title(__('Reply failed'))
+                            ->body($result['error'] ?? __('Something went wrong.'))
+                            ->danger()
+                            ->send();
+                    }),
             ])
             ->defaultSort('received_at', 'desc')
             ->poll('10s');
