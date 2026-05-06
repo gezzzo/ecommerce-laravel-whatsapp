@@ -33,7 +33,7 @@
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:title" content="@yield('og_title', $siteName . ' - ملابس نسائية مغربية')">
     <meta property="og:description" content="@yield('meta_description', $siteName . ' - متجرك الأول في المغرب لأرقى الملابس النسائية والمحجبات. شحن سريع لجميع المدن.')">
-    <meta property="og:image" content="@yield('og_image', asset('images/og-default.png'))">
+    <meta property="og:image" content="@yield('og_image', asset('images/og_image.png'))">
     <meta property="og:locale" content="ar_MA">
     <meta property="og:site_name" content="{{ $siteName }}">
 
@@ -41,7 +41,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="@yield('og_title', $siteName . ' - ملابس نسائية مغربية')">
     <meta name="twitter:description" content="@yield('meta_description', $siteName . ' - متجرك الأول في المغرب لأرقى الملابس النسائية والمحجبات. شحن سريع لجميع المدن.')">
-    <meta name="twitter:image" content="@yield('og_image', asset('images/og-default.png'))">
+    <meta name="twitter:image" content="@yield('og_image', asset('images/og_image.png'))">
 
     @if(filled($siteMetaPixelId))
         {{-- Meta Pixel --}}
