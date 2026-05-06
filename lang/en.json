@@ -355,5 +355,6 @@
     "Please choose a delivery zone before sending this order.": "Please choose a delivery zone before sending this order.",
     "city belongs to another company please change it.": "City belongs to another company, please change it.",
     "Missing delivery tracking number.": "Missing delivery tracking number.",
-    "No delivery company is linked to this order.": "No delivery company is linked to this order."
+    "No delivery company is linked to this order.": "No delivery company is linked to this order.",
+    "Product unavailable": "Product unavailable"
 }

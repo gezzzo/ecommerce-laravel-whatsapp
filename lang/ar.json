@@ -480,5 +480,6 @@
     "Please choose a delivery zone before sending this order.": "يرجى اختيار منطقة التوصيل قبل إرسال الطلب.",
     "city belongs to another company please change it.": "المدينة تابعة لشركة توصيل أخرى، يرجى تغييرها.",
     "Missing delivery tracking number.": "رقم التتبع غير موجود.",
-    "No delivery company is linked to this order.": "لا توجد شركة توصيل مرتبطة بهذا الطلب."
+    "No delivery company is linked to this order.": "لا توجد شركة توصيل مرتبطة بهذا الطلب.",
+    "Product unavailable": "المنتج غير متوفر"
 }
