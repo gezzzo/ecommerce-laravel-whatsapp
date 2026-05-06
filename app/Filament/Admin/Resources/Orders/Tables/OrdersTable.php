@@ -206,7 +206,7 @@ class OrdersTable
                     )
                     ->action(function (Order $record) {
                         try {
-                            $status = $record->trackDelivery();
+                            $status = app(OrderDeliveryService::class)->track($record);
 
                             Notification::make()
                                 ->title(__('order.messages.delivery_tracked_title'))
