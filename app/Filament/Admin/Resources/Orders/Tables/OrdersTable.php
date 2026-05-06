@@ -115,7 +115,7 @@ class OrdersTable
             ->recordActions([
 
                 Action::make('confirm_whatsapp')
-                    ->label(__('Confirm WhatsApp'))
+                    ->label(__('Confirm'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->visible(fn (Order $record): bool => $record->whatsapp_confirmed_at === null)
