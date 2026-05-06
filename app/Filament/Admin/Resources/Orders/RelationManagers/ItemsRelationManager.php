@@ -60,10 +60,25 @@ class ItemsRelationManager extends RelationManager
             ->columns([
                 ImageColumn::make('image')
                     ->label(__('Image'))
-                    ->circular(),
+                    ->circular()
+                    ->getStateUsing(function (Model $record) {
+                        $skuable = $record->skuCode?->skuable;
+                        if ($skuable instanceof \App\Models\ProductVariant) {
+                            return $skuable->image ?? $skuable->product?->thumbnail;
+                        }
+                        return $skuable?->thumbnail;
+                    }),
                 TextColumn::make('name')
                     ->label(__('Name'))
-                    ->searchable(),
+                    ->getStateUsing(function (Model $record) {
+                        $skuable = $record->skuCode?->skuable;
+                        if ($skuable instanceof \App\Models\ProductVariant) {
+                            $parts = array_filter([$skuable->color?->name, $skuable->size?->name]);
+                            $suffix = count($parts) > 0 ? ' (' . implode(' - ', $parts) . ')' : '';
+                            return $skuable->product?->name . $suffix;
+                        }
+                        return $skuable?->name;
+                    }),
                 TextColumn::make('sku_code')
                     ->label(__('SKU')),
                 TextColumn::make('quantity')
