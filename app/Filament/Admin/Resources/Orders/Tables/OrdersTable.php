@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources\Orders\Tables;
 use App\Enums\DeliveryStatusEnum;
 use App\Enums\OrderStatusEnum;
 use App\Models\Order;
+use App\Services\Delivery\OrderDeliveryService;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -159,60 +160,33 @@ class OrdersTable
                     ->icon('heroicon-o-truck')
                     ->color('success')
                     ->visible(fn (Order $record): bool => ! $record->tracking_number &&
-                        $record->delivery_company_id &&
                         $record->delivery_zone_id
                     )
                     ->action(function (Order $record) {
                         try {
-                            $result = $record->sendToDelivery();
+                            $dispatch = app(OrderDeliveryService::class)->sendToActiveCompany($record);
+                            $order = $dispatch['order'];
+                            $companyName = $dispatch['company']->provider?->name ?? __('Delivery Company');
 
-                            // فحص النتيجة
-                            $addParcelResult = $result['ADD-PARCEL'] ?? null;
-
-                            if (! $addParcelResult) {
-                                Notification::make()
-                                    ->title('خطأ في الاتصال')
-                                    ->body('لم يتم استقبال رد من شركة التوصيل')
-                                    ->danger()
-                                    ->persistent()
-                                    ->send();
-
-                                return;
-                            }
-
-                            // فحص حالة العميل
-                            $customerResult = $addParcelResult['CUSTOMER']['RESULT'] ?? 'ERROR';
-                            $customerMessage = $addParcelResult['CUSTOMER']['MESSAGE'] ?? '';
-
-                            // فحص النتيجة النهائية
-                            $finalResult = $addParcelResult['RESULT'] ?? 'ERROR';
-                            $finalMessage = $addParcelResult['MESSAGE'] ?? '';
-
-                            // لو فيه خطأ
-                            if ($finalResult === 'ERROR') {
-                                $errorDetails = static::getErrorDetails($finalMessage, $customerResult, $customerMessage);
-
-                                Notification::make()
-                                    ->title('فشل الإرسال لشركة التوصيل')
-                                    ->body($errorDetails)
-                                    ->danger()
-                                    ->persistent() // عشان تفضل ظاهرة
-                                    ->send();
-
-                                return;
-                            }
-
-                            // لو نجحت العملية
                             Notification::make()
                                 ->title(__('order.messages.delivery_sent_title'))
-                                ->body(__('order.messages.delivery_sent_body', ['tracking_number' => $record->tracking_number]))
+                                ->body(__('order.messages.delivery_sent_to_company_body', [
+                                    'company' => $companyName,
+                                    'tracking_number' => $order->tracking_number ?? __('order.placeholders.not_specified'),
+                                ]))
                                 ->success()
                                 ->send();
                         } catch (\Exception $e) {
-                            // في حالة حدوث أي خطأ، عرض رسالة للمستخدم
+                            $cityId = $record->deliveryZone?->external_city_id;
+                            $message = $e->getMessage();
+
+                            if ($cityId) {
+                                $message .= "\n".__('order.messages.delivery_city_id', ['city_id' => $cityId]);
+                            }
+
                             Notification::make()
-                                ->title('خطأ في الإرسال')
-                                ->body($e->getMessage())
+                                ->title(__('order.messages.delivery_send_failed_title'))
+                                ->body($message)
                                 ->danger()
                                 ->persistent()
                                 ->send();

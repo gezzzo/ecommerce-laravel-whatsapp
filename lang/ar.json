@@ -444,6 +444,9 @@
     "order.fields.delivery_status": "حالة التوصيل",
     "order.messages.delivery_sent_title": "تم إرسال طلب التوصيل",
     "order.messages.delivery_sent_body": "تم إرسال طلب التوصيل. رقم التتبع: :tracking_number",
+    "order.messages.delivery_sent_to_company_body": "تم إرسال الطلب إلى :company بنجاح. رقم التتبع: :tracking_number",
+    "order.messages.delivery_send_failed_title": "فشل إرسال الطلب لشركة التوصيل",
+    "order.messages.delivery_city_id": "معرّف مدينة التوصيل: :city_id",
     "order.messages.delivery_tracked_title": "تم تحديث التوصيل",
     "order.messages.delivery_tracked_body": "تم تحديث حالة التوصيل: :status",
     "order.messages.delivery_track_failed_title": "فشل تتبع التوصيل",
@@ -461,5 +464,8 @@
     "order.modals.add_comment_heading": "إضافة تعليق",
     "order.placeholders.status_change_reason": "سبب تغيير الحالة",
     "order.placeholders.delivery_status_change_reason": "سبب تغيير حالة التوصيل",
-    "order.placeholders.not_specified": "غير محدد"
+    "order.placeholders.not_specified": "غير محدد",
+    "No active delivery company found.": "لا توجد شركة توصيل نشطة.",
+    "Please choose a delivery zone before sending this order.": "يرجى اختيار منطقة التوصيل قبل إرسال الطلب.",
+    "city belongs to another company please change it.": "المدينة تابعة لشركة توصيل أخرى، يرجى تغييرها."
 }

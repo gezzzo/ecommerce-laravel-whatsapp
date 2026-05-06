@@ -13,6 +13,7 @@ use App\Models\SkuCode;
 use App\Models\TrackingParcel;
 use App\Services\Delivery\DeliveryGatewayService;
 use App\Services\Delivery\Handlers\OzoneHandler;
+use App\Services\Delivery\OrderDeliveryService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -105,7 +106,7 @@ class OzoneHandlerTest extends TestCase
 
     public function test_gateway_resolves_ozone_handler(): void
     {
-        $gateway = new DeliveryGatewayService();
+        $gateway = new DeliveryGatewayService;
         $handler = $gateway->getHandler($this->company);
 
         $this->assertInstanceOf(OzoneHandler::class, $handler);
@@ -125,7 +126,7 @@ class OzoneHandlerTest extends TestCase
             'client_key' => 'key',
         ]);
 
-        $gateway = new DeliveryGatewayService();
+        $gateway = new DeliveryGatewayService;
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Unsupported delivery provider');
@@ -145,7 +146,7 @@ class OzoneHandlerTest extends TestCase
             ])),
         ]);
 
-        $handler = new OzoneHandler();
+        $handler = new OzoneHandler;
         $result = $handler->send($this->order, $this->company);
 
         $this->assertArrayHasKey('ADD-PARCEL', $result);
@@ -162,6 +163,46 @@ class OzoneHandlerTest extends TestCase
         ]);
     }
 
+    public function test_order_delivery_service_assigns_active_company_and_sends_order(): void
+    {
+        $this->order->update(['delivery_company_id' => null]);
+
+        Http::fake([
+            'api.ozonexpress.ma/*' => Http::response(json_encode([
+                'ADD-PARCEL' => [
+                    'RESULT' => 'OK',
+                    'NEW-PARCEL' => [
+                        'TRACKING-NUMBER' => 'OZ-ACTIVE-001',
+                    ],
+                ],
+            ])),
+        ]);
+
+        $result = app(OrderDeliveryService::class)->sendToActiveCompany($this->order);
+
+        $this->assertSame($this->company->id, $result['company']->id);
+        $this->assertSame($this->company->id, $result['order']->delivery_company_id);
+        $this->assertSame('OZ-ACTIVE-001', $result['order']->tracking_number);
+        $this->assertSame('Sent', $result['order']->delivery_status);
+    }
+
+    public function test_order_delivery_service_rejects_city_for_another_active_company(): void
+    {
+        $this->company->update(['is_active' => false]);
+
+        DeliveryCompany::create([
+            'delivery_provider_id' => $this->provider->id,
+            'api_token' => 'other-token',
+            'client_key' => 'other-key',
+            'is_active' => true,
+        ]);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('another company');
+
+        app(OrderDeliveryService::class)->sendToActiveCompany($this->order);
+    }
+
     public function test_send_throws_on_missing_credentials(): void
     {
         $companyNoCredentials = DeliveryCompany::create([
@@ -170,7 +211,7 @@ class OzoneHandlerTest extends TestCase
             'client_key' => null,
         ]);
 
-        $handler = new OzoneHandler();
+        $handler = new OzoneHandler;
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Missing OZone credentials');
@@ -189,7 +230,7 @@ class OzoneHandlerTest extends TestCase
             'total' => 50.00,
         ]);
 
-        $handler = new OzoneHandler();
+        $handler = new OzoneHandler;
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Invalid or missing delivery zone');
@@ -202,7 +243,7 @@ class OzoneHandlerTest extends TestCase
             'api.ozonexpress.ma/*' => Http::response('Server Error', 500),
         ]);
 
-        $handler = new OzoneHandler();
+        $handler = new OzoneHandler;
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('OZone HTTP error: HTTP 500');
@@ -220,7 +261,7 @@ class OzoneHandlerTest extends TestCase
             ])),
         ]);
 
-        $handler = new OzoneHandler();
+        $handler = new OzoneHandler;
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('OZone API error: Invalid API key');
@@ -238,7 +279,7 @@ class OzoneHandlerTest extends TestCase
             ])),
         ]);
 
-        $handler = new OzoneHandler();
+        $handler = new OzoneHandler;
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Phone number invalid');
@@ -253,13 +294,13 @@ class OzoneHandlerTest extends TestCase
                 'NEW-PARCEL' => ['TRACKING-NUMBER' => 'OZ-DUP-001'],
             ],
         ]);
-        $duplicatedBody = $responseBody . $responseBody;
+        $duplicatedBody = $responseBody.$responseBody;
 
         Http::fake([
             'api.ozonexpress.ma/*' => Http::response($duplicatedBody),
         ]);
 
-        $handler = new OzoneHandler();
+        $handler = new OzoneHandler;
         $result = $handler->send($this->order, $this->company);
 
         $this->order->refresh();
@@ -291,7 +332,7 @@ class OzoneHandlerTest extends TestCase
             ]),
         ]);
 
-        $handler = new OzoneHandler();
+        $handler = new OzoneHandler;
         $status = $handler->track($this->order, $this->company);
 
         $this->assertEquals('Delivered', $status);
@@ -328,7 +369,7 @@ class OzoneHandlerTest extends TestCase
             ]),
         ]);
 
-        $handler = new OzoneHandler();
+        $handler = new OzoneHandler;
         $status = $handler->track($this->order, $this->company);
 
         $this->assertEquals('Delivered', $status);
@@ -339,7 +380,7 @@ class OzoneHandlerTest extends TestCase
 
     public function test_track_throws_without_tracking_number(): void
     {
-        $handler = new OzoneHandler();
+        $handler = new OzoneHandler;
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Missing delivery tracking number');
@@ -354,7 +395,7 @@ class OzoneHandlerTest extends TestCase
             'api.ozonexpress.ma/*' => Http::response('Error', 502),
         ]);
 
-        $handler = new OzoneHandler();
+        $handler = new OzoneHandler;
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('OZone tracking error: HTTP 502');
@@ -388,7 +429,7 @@ class OzoneHandlerTest extends TestCase
             ]),
         ]);
 
-        $handler = new OzoneHandler();
+        $handler = new OzoneHandler;
         $handler->track($this->order, $this->company);
 
         $count = TrackingParcel::where('order_id', $this->order->id)

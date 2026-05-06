@@ -319,6 +319,9 @@
     "order.fields.delivery_status": "Delivery status",
     "order.messages.delivery_sent_title": "Delivery request sent",
     "order.messages.delivery_sent_body": "Delivery request sent. Tracking number: :tracking_number",
+    "order.messages.delivery_sent_to_company_body": "Order sent to :company successfully. Tracking number: :tracking_number",
+    "order.messages.delivery_send_failed_title": "Delivery send failed",
+    "order.messages.delivery_city_id": "Delivery city ID: :city_id",
     "order.messages.delivery_tracked_title": "Delivery updated",
     "order.messages.delivery_tracked_body": "Delivery status updated: :status",
     "order.messages.delivery_track_failed_title": "Delivery tracking failed",
@@ -336,5 +339,8 @@
     "order.modals.add_comment_heading": "Add comment",
     "order.placeholders.status_change_reason": "Reason for changing the status",
     "order.placeholders.delivery_status_change_reason": "Reason for changing delivery status",
-    "order.placeholders.not_specified": "Not specified"
+    "order.placeholders.not_specified": "Not specified",
+    "No active delivery company found.": "No active delivery company found.",
+    "Please choose a delivery zone before sending this order.": "Please choose a delivery zone before sending this order.",
+    "city belongs to another company please change it.": "City belongs to another company, please change it."
 }
