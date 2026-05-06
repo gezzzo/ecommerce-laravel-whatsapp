@@ -14,6 +14,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
@@ -121,7 +122,7 @@ class ProductForm
                             ->dehydrated(false),
                     ])
                     ->columns(2)
-                    ->visible(fn (Get $get): bool => ! (bool) $get('has_variants')),
+                    ->visible(fn (Get $get, string $operation): bool => $operation === 'create' && ! (bool) $get('has_variants')),
 
                 // ── Variant Generation Section ──
                 Section::make(__('Generate Color × Size Combinations'))
@@ -133,14 +134,9 @@ class ProductForm
                             ->numeric()
                             ->default(0)
                             ->minValue(0)
-                            ->helperText(__('Initial stock for each generated variant')),
+                            ->helperText(__('Initial stock for each generated variant'))
+                            ->hidden(fn (string $operation): bool => $operation === 'edit'),
 
-                        Select::make('variant_sizes')
-                            ->label(__('Sizes'))
-                            ->options(fn () => Size::pluck('name', 'id'))
-                            ->multiple()
-                            ->searchable()
-                            ->preload(),
                         Select::make('variant_size_type')
                             ->label(__('Size Type'))
                             ->options(fn () => Size::select('type')->distinct()->pluck('type', 'type'))
@@ -152,12 +148,38 @@ class ProductForm
                                     $set('variant_sizes', $sizeIds);
                                 }
                             }),
+                        Select::make('variant_sizes')
+                            ->label(__('Sizes'))
+                            ->options(fn () => Size::pluck('name', 'id'))
+                            ->multiple()
+                            ->searchable()
+                            ->preload(),
                         Select::make('variant_colors')
                             ->label(__('Colors'))
                             ->options(fn () => Color::pluck('name', 'id'))
                             ->multiple()
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->live(),
+
+                        Group::make()
+                            ->schema(function (Get $get) {
+                                $colorIds = $get('variant_colors') ?? [];
+                                $schemas = [];
+                                foreach ($colorIds as $colorId) {
+                                    $color = Color::find($colorId);
+                                    if ($color) {
+                                        $schemas[] = ImageUploadHelper::make("color_images.{$colorId}")
+                                            ->label(__('صورة اللون: :color', ['color' => $color->name]))
+                                            ->directory('variants')
+                                            ->dehydrated(false);
+                                    }
+                                }
+
+                                return $schemas;
+                            })
+                            ->columns(4)
+                            ->columnSpanFull(),
                         Placeholder::make('combinations_preview')
                             ->hiddenLabel()
                             ->content(function (Get $get): HtmlString {
@@ -194,6 +216,7 @@ class ProductForm
                                 ->action(function (Get $get, Set $set): void {
                                     $colorIds = $get('variant_colors') ?? [];
                                     $sizeIds = $get('variant_sizes') ?? [];
+                                    $colorImages = $get('color_images') ?? [];
                                     $sellingPrice = (float) ($get('selling_price') ?? 0);
                                     $priceBeforeDiscount = (float) ($get('price_before_discount') ?? 0);
 
@@ -214,6 +237,9 @@ class ProductForm
                                     $sizeList = empty($sizeIds) ? [null] : $sizeIds;
 
                                     foreach ($colorList as $colorId) {
+                                        $imageState = $colorImages[$colorId] ?? null;
+                                        $imagePath = is_array($imageState) ? (array_values($imageState)[0] ?? null) : $imageState;
+
                                         foreach ($sizeList as $sizeId) {
                                             $combo = ($colorId ?? '').'-'.($sizeId ?? '');
                                             if (in_array($combo, $existingCombos)) {
@@ -226,7 +252,7 @@ class ProductForm
                                                 'cost_price' => 0,
                                                 'price_before_discount' => $priceBeforeDiscount,
                                                 'selling_price' => $sellingPrice,
-                                                'image' => null,
+                                                'image' => $imagePath,
                                             ];
                                         }
                                     }
@@ -241,6 +267,7 @@ class ProductForm
                                     $set('variant_colors', []);
                                     $set('variant_sizes', []);
                                     $set('variant_size_type', null);
+                                    $set('color_images', []);
                                 }),
                         ]),
                     ])
@@ -271,7 +298,8 @@ class ProductForm
                                     ->numeric()
                                     ->default(0)
                                     ->minValue(0)
-                                    ->dehydrated(false),
+                                    ->dehydrated(false)
+                                    ->hidden(fn (string $operation): bool => $operation === 'edit'),
                                 TextInput::make('cost_price')
                                     ->label(__('Cost Price'))
                                     ->numeric()

@@ -1,6 +1,7 @@
 @php
     $siteName = $storeName ?? \App\Models\StoreSetting::storeName();
     $siteContactInfo = $contactInfo ?? \App\Models\StoreSetting::contactInfo();
+    $siteMetaPixelId = $metaPixelId ?? \App\Models\StoreSetting::metaPixelId();
     $sitePhone = $siteContactInfo['phone'] ?? '';
     $siteEmail = $siteContactInfo['email'] ?? '';
     $siteWorkingHours = $siteContactInfo['working_hours'] ?? '';
@@ -41,6 +42,27 @@
     <meta name="twitter:title" content="@yield('og_title', $siteName)">
     <meta name="twitter:description" content="@yield('meta_description', $siteName . ' - أفضل المنتجات بأسعار منافسة وشحن سريع')">
     <meta name="twitter:image" content="@yield('og_image', asset('images/og-default.png'))">
+
+    @if(filled($siteMetaPixelId))
+        {{-- Meta Pixel --}}
+        <script>
+            !function(f,b,e,v,n,t,s)
+            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}(window, document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', @json($siteMetaPixelId));
+            fbq('track', 'PageView');
+        </script>
+        <noscript>
+            <img height="1" width="1" style="display:none"
+                 src="https://www.facebook.com/tr?id={{ urlencode($siteMetaPixelId) }}&ev=PageView&noscript=1"
+                 alt="">
+        </noscript>
+    @endif
 
     {{-- Structured Data - Organization --}}
     <script type="application/ld+json">

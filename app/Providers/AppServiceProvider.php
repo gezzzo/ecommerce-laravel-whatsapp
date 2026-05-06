@@ -34,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with('navCategories', Category::orderBy('sort_order')->limit(8)->get());
             $view->with('wishlistCount', count($wishlistSkuCodes));
             $view->with('announcementBarText', StoreSetting::announcementBarText());
+            $view->with('metaPixelId', StoreSetting::metaPixelId());
         });
 
         View::composer('home', function ($view) {

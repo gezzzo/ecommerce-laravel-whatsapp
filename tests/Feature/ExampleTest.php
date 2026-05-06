@@ -58,4 +58,15 @@ class ExampleTest extends TestCase
             ->assertSee('https://instagram.com/store')
             ->assertSee('https://x.com/store');
     }
+
+    public function test_storefront_includes_meta_pixel_when_configured(): void
+    {
+        StoreSetting::set('meta_pixel_id', '123456789012345', 'string', 'tracking');
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee("fbq('init', \"123456789012345\")", false)
+            ->assertSee("fbq('track', 'PageView')", false)
+            ->assertSee('https://www.facebook.com/tr?id=123456789012345&ev=PageView&noscript=1', false);
+    }
 }

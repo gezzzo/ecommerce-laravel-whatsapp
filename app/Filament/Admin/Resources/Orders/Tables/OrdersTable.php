@@ -243,7 +243,7 @@ class OrdersTable
                             'order' => $record,
                         ]);
                     })
-                    ->modalWidth('4xl')
+                    ->modalWidth('3xl')
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel(__('order.actions.close')),
 

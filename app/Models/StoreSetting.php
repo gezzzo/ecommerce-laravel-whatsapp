@@ -181,6 +181,13 @@ class StoreSetting extends Model
         return (string) static::get('store_name', 'متجري');
     }
 
+    public static function metaPixelId(): string
+    {
+        $pixelId = trim((string) static::get('meta_pixel_id', ''));
+
+        return preg_match('/^\d{5,32}$/', $pixelId) ? $pixelId : '';
+    }
+
     /**
      * @return array{phone: string, email: string, working_hours: string, facebook_url: string, instagram_url: string, twitter_url: string}
      */

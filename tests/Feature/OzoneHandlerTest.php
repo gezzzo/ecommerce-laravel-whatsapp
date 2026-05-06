@@ -404,6 +404,8 @@ class OzoneHandlerTest extends TestCase
         ])->render();
 
         $this->assertStringContainsString('OZ-HISTORY-001', $html);
+        $this->assertStringContainsString('data-testid="tracking-timeline"', $html);
+        $this->assertStringContainsString(__('order.tracking.timeline'), $html);
         $this->assertStringContainsString('Picked Up', $html);
         $this->assertStringContainsString('Package picked up', $html);
     }

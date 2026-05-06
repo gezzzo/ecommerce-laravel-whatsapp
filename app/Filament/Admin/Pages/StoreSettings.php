@@ -66,6 +66,7 @@ class StoreSettings extends Page implements HasForms
             'contact_facebook_url' => $contactInfo['facebook_url'],
             'contact_instagram_url' => $contactInfo['instagram_url'],
             'contact_twitter_url' => $contactInfo['twitter_url'],
+            'meta_pixel_id' => StoreSetting::metaPixelId(),
         ]);
     }
 
@@ -212,6 +213,18 @@ class StoreSettings extends Page implements HasForms
                             ->required()
                             ->visible(fn ($get): bool => $get('shipping_mode') === StoreSetting::SHIPPING_FREE_AFTER_ITEMS),
                     ]),
+
+                Section::make(__('Tracking Pixels'))
+                    ->description(__('Connect marketing pixels used for ads and conversion tracking.'))
+                    ->schema([
+                        TextInput::make('meta_pixel_id')
+                            ->label(__('Meta Pixel ID'))
+                            ->placeholder('123456789012345')
+                            ->helperText(__('Paste the numeric Pixel ID from Meta Events Manager. Leave empty to disable it.'))
+                            ->maxLength(32)
+                            ->rules(['nullable', 'regex:/^\d{5,32}$/'])
+                            ->columnSpanFull(),
+                    ]),
             ])
             ->statePath('data');
     }
@@ -236,6 +249,7 @@ class StoreSettings extends Page implements HasForms
         StoreSetting::set('contact_facebook_url', $data['contact_facebook_url'] ?? '', 'string', 'contact');
         StoreSetting::set('contact_instagram_url', $data['contact_instagram_url'] ?? '', 'string', 'contact');
         StoreSetting::set('contact_twitter_url', $data['contact_twitter_url'] ?? '', 'string', 'contact');
+        StoreSetting::set('meta_pixel_id', $data['meta_pixel_id'] ?? '', 'string', 'tracking');
 
         Notification::make()
             ->title(__('Settings saved successfully').' ✅')
