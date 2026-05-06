@@ -69,22 +69,13 @@
             </h3>
         </a>
 
-        {{-- Variants Indicator --}}
-        @if($product->has_variants && $variantsCount > 0)
-        <div class="flex items-center gap-1 mb-2">
-            <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
-                {{ $variantsCount }} خيار متاح
-            </span>
-        </div>
-        @endif
-
         <div class="flex items-center justify-between" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
             <meta itemprop="priceCurrency" content="MAD">
             <meta itemprop="availability" content="{{ $isInStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' }}">
             <div>
-                <span class="font-bold text-primary-600 text-base" itemprop="price" content="{{ $product->selling_price }}">{{ number_format($product->selling_price) }} ج</span>
+                <span class="font-bold text-primary-600 text-base" itemprop="price" content="{{ $product->selling_price }}">{{ number_format($product->selling_price) }} درهم</span>
                 @if($hasDiscount)
-                <span class="text-xs text-gray-400 line-through mr-1">{{ number_format($product->price_before_discount) }} ج</span>
+                <span class="text-xs text-gray-400 line-through mr-1">{{ number_format($product->price_before_discount) }} درهم</span>
                 @endif
             </div>
 

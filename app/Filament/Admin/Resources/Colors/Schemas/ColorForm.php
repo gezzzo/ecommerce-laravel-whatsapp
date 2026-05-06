@@ -13,9 +13,11 @@ class ColorForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label(__('Name'))
                     ->required()
                     ->maxLength(255),
                 ColorPicker::make('hex_code')
+                    ->label(__('Color'))
                     ->required(),
             ]);
     }

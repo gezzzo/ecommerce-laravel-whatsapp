@@ -16,39 +16,48 @@ class OrderReturnForm
         return $schema
             ->components([
                 Select::make('order_id')
+                    ->label(__('Order'))
                     ->relationship('order', 'order_number')
                     ->required()
                     ->searchable()
                     ->preload(),
                 Select::make('order_item_id')
+                    ->label(__('Item'))
                     ->relationship('orderItem', 'id')
                     ->required()
                     ->searchable()
                     ->preload(),
                 TextInput::make('quantity')
+                    ->label(__('Quantity'))
                     ->required()
                     ->numeric()
                     ->minValue(1),
                 TextInput::make('refund_amount')
+                    ->label(__('Refund Amount'))
                     ->required()
                     ->numeric()
-                    ->prefix('$'),
+                    ->prefix(__('MAD')),
                 Select::make('status')
+                    ->label(__('Status'))
                     ->options([
-                        'pending' => 'Pending',
-                        'approved' => 'Approved',
-                        'rejected' => 'Rejected',
-                        'completed' => 'Completed',
+                        'pending' => __('Pending'),
+                        'approved' => __('Approved'),
+                        'rejected' => __('Rejected'),
+                        'completed' => __('Completed'),
                     ])
                     ->default('pending')
                     ->required(),
                 Textarea::make('reason')
+                    ->label(__('Reason'))
                     ->columnSpanFull(),
                 Textarea::make('admin_notes')
+                    ->label(__('Admin Notes'))
                     ->columnSpanFull(),
                 Toggle::make('inventory_restored')
+                    ->label(__('Inventory Restored'))
                     ->default(false),
-                DateTimePicker::make('processed_at'),
+                DateTimePicker::make('processed_at')
+                    ->label(__('Processed At')),
             ]);
     }
 }

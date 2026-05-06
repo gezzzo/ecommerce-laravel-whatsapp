@@ -13,6 +13,7 @@ class UserForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label(__('Name'))
                     ->required()
                     ->maxLength(255),
                 TextInput::make('phone')
@@ -23,8 +24,10 @@ class UserForm
                     ->label(__('Email address'))
                     ->email()
                     ->maxLength(255),
-                DateTimePicker::make('email_verified_at'),
+                DateTimePicker::make('email_verified_at')
+                    ->label(__('Email Verified At')),
                 TextInput::make('password')
+                    ->label(__('Password'))
                     ->password()
                     ->dehydrated(fn (?string $state): bool => filled($state))
                     ->required(fn (string $operation): bool => $operation === 'create')

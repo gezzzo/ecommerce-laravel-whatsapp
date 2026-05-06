@@ -103,6 +103,18 @@
 
     $stockQty = $product->has_variants ? null : ($product->inventory?->quantity ?? 0);
     $descriptionHtml = str_replace(['&nbsp;', "\xc2\xa0"], ' ', $product->description ?? '');
+    $variantSelectionPrompt = 'أضف للسلة';
+
+    if ($product->has_variants) {
+        $variantSelectionPrompt = match (true) {
+            $availableSizes->isNotEmpty() && $availableColors->isNotEmpty() => 'اختر المقاس أولاً',
+            $availableSizes->isNotEmpty() => 'اختر المقاس',
+            $availableColors->isNotEmpty() => 'اختر اللون',
+            default => 'اختر الخيارات',
+        };
+    }
+
+    $isAddToCartDisabled = $product->has_variants || $stockQty <= 0;
 @endphp
 
 @push('styles')
@@ -134,7 +146,7 @@
 @endpush
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-28 md:py-8">
 
     {{-- Breadcrumb --}}
     <nav class="text-sm text-gray-500 mb-6 flex items-center gap-2" aria-label="مسار التصفح">
@@ -253,17 +265,28 @@
                     </div>
                     @endif
 
-                    {{-- Step 2: Color Selector (hidden until size is selected) --}}
-                    @if($availableColors->isNotEmpty())
-                    <div class="mb-5 transition-all duration-300" id="colorSelectorWrapper" style="display: none; opacity: 0;">
+                    {{-- Step 2: Color Selector (preview first, selectable after size) --}}
+                    @if($availableSizes->isNotEmpty() && $availableColors->isNotEmpty())
+                    <div class="mb-5 transition-all duration-300" id="colorSelectorWrapper">
                         <h4 class="text-sm font-semibold text-gray-700 mb-3">
                             <span class="inline-flex items-center justify-center w-5 h-5 bg-primary-100 text-primary-700 text-xs rounded-full mr-1">2</span>
-                            اللون: <span id="selectedColorName" class="text-primary-600 font-normal">اختر اللون</span>
+                            اللون: <span id="selectedColorName" class="text-primary-600 font-normal">اختر المقاس أولاً</span>
                         </h4>
                         <div class="flex flex-wrap gap-3" id="colorSwatchesContainer">
-                            {{-- Populated dynamically by JS based on selected size --}}
+                            @foreach($availableColors as $color)
+                            <button type="button"
+                                    class="color-swatch color-preview-swatch w-9 h-9 rounded-full border-2 border-gray-200 relative opacity-70 cursor-not-allowed"
+                                    style="background-color: {{ $color->hex_code ?? '#ccc' }}"
+                                    title="{{ $color->name }} - اختر المقاس أولاً"
+                                    aria-label="اللون متاح للمنتج: {{ $color->name }}"
+                                    disabled>
+                                <span class="sr-only">{{ $color->name }}</span>
+                            </button>
+                            @endforeach
                         </div>
-                        <p class="text-xs text-gray-400 mt-2" id="colorHint"></p>
+                        <p class="text-xs text-gray-400 mt-2" id="colorHint">
+                            هذه كل ألوان المنتج. اختر المقاس لتفعيل الألوان المتاحة له.
+                        </p>
                     </div>
                     @endif
 
@@ -315,12 +338,24 @@
 
                     <button type="submit"
                             id="addToCartBtn"
-                            {{ $product->has_variants ? 'disabled' : ((!$product->has_variants && $stockQty <= 0) ? 'disabled' : '') }}
-                            class="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            @disabled($isAddToCartDisabled)
+                            class="hidden flex-1 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded-xl md:flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        <span id="addToCartText">{{ $product->has_variants ? 'اختر اللون والمقاس' : 'أضف للسلة' }}</span>
+                        <span id="addToCartText">{{ $variantSelectionPrompt }}</span>
                     </button>
                 </form>
+
+                <div class="fixed inset-x-0 bottom-0 z-50 border-t border-gray-100 bg-white/95 px-4 py-3 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur md:hidden"
+                     style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
+                    <button type="submit"
+                            form="addToCartForm"
+                            id="mobileAddToCartBtn"
+                            @disabled($isAddToCartDisabled)
+                            class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        <span id="mobileAddToCartText">{{ $variantSelectionPrompt }}</span>
+                    </button>
+                </div>
 
                 {{-- Wishlist --}}
                 <form action="{{ route('wishlist.add') }}" method="POST" class="mt-3">
@@ -392,6 +427,24 @@
     let selectedColorId = null;
     let selectedSizeId = null;
 
+    function setAddToCartState(isDisabled, text) {
+        ['addToCartBtn', 'mobileAddToCartBtn'].forEach(id => {
+            const button = document.getElementById(id);
+
+            if (button) {
+                button.disabled = isDisabled;
+            }
+        });
+
+        ['addToCartText', 'mobileAddToCartText'].forEach(id => {
+            const label = document.getElementById(id);
+
+            if (label) {
+                label.textContent = text;
+            }
+        });
+    }
+
     function selectSize(el) {
         document.querySelectorAll('.size-btn').forEach(s => {
             s.classList.remove('active', 'border-primary-500', 'bg-primary-50', 'text-primary-700');
@@ -415,8 +468,7 @@
         if (colorWrapper) {
             document.getElementById('selectedVariantId').value = '';
             document.getElementById('selectedWishlistVariantId').value = '';
-            document.getElementById('addToCartBtn').disabled = true;
-            document.getElementById('addToCartText').textContent = 'اختر اللون';
+            setAddToCartState(true, 'اختر اللون');
         } else {
             // No colors — match variant directly by size only
             matchVariant();
@@ -520,14 +572,12 @@
             if (matched.stock > 0) {
                 stockEl.className = 'bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full';
                 stockEl.textContent = 'متوفر في المخزون (' + matched.stock + ')';
-                document.getElementById('addToCartBtn').disabled = false;
-                document.getElementById('addToCartText').textContent = 'أضف للسلة';
+                setAddToCartState(false, 'أضف للسلة');
                 document.getElementById('qty').max = matched.stock;
             } else {
                 stockEl.className = 'bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full';
                 stockEl.textContent = 'غير متوفر حالياً';
-                document.getElementById('addToCartBtn').disabled = true;
-                document.getElementById('addToCartText').textContent = 'غير متوفر';
+                setAddToCartState(true, 'غير متوفر');
             }
 
             const skuEl = document.getElementById('skuDisplay');
@@ -537,8 +587,7 @@
         } else {
             document.getElementById('selectedVariantId').value = '';
             document.getElementById('selectedWishlistVariantId').value = '';
-            document.getElementById('addToCartBtn').disabled = true;
-            document.getElementById('addToCartText').textContent = hasSizes ? 'اختر المقاس واللون' : 'اختر اللون';
+            setAddToCartState(true, hasSizes ? 'اختر المقاس واللون' : 'اختر اللون');
         }
     }
 

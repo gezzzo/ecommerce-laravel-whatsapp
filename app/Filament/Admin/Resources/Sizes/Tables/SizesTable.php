@@ -18,9 +18,11 @@ class SizesTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('type')
+                    ->label(__('Type'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('variants_count')
@@ -28,6 +30,7 @@ class SizesTable
                     ->label(__('Variants'))
                     ->sortable(),
                 TextColumn::make('created_at')
+                    ->label(__('Created At'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

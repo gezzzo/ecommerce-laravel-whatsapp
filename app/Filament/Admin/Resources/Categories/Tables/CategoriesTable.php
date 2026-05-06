@@ -15,13 +15,17 @@ class CategoriesTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('slug')
+                    ->label(__('Slug'))
                     ->searchable(),
                 TextColumn::make('icon')
+                    ->label(__('Icon'))
                     ->searchable(),
                 TextColumn::make('sort_order')
+                    ->label(__('Sort Order'))
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('products_count')
@@ -29,6 +33,7 @@ class CategoriesTable
                     ->label(__('Products'))
                     ->sortable(),
                 TextColumn::make('created_at')
+                    ->label(__('Created At'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

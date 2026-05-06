@@ -23,15 +23,18 @@ class DeliveryCompaniesTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('api_token')
+                    ->label(__('API Token'))
                     ->limit(20)
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_active')
+                    ->label(__('Active'))
                     ->boolean(),
                 TextColumn::make('zones_count')
                     ->counts('zones')
                     ->label(__('Zones'))
                     ->sortable(),
                 TextColumn::make('created_at')
+                    ->label(__('Created At'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

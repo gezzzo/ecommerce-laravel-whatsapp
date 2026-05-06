@@ -24,14 +24,24 @@ class OrderReturnsTable
                     ->label(__('Item'))
                     ->searchable(),
                 TextColumn::make('quantity')
+                    ->label(__('Quantity'))
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('refund_amount')
+                    ->label(__('Refund Amount'))
                     ->money('MAD')
                     ->sortable(),
                 TextColumn::make('status')
+                    ->label(__('Status'))
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'pending' => __('Pending'),
+                        'approved' => __('Approved'),
+                        'rejected' => __('Rejected'),
+                        'completed' => __('Completed'),
+                        default => $state,
+                    })
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn ($record): string => match ($record->status) {
                         'pending' => 'warning',
                         'approved' => 'info',
                         'rejected' => 'danger',
@@ -39,23 +49,27 @@ class OrderReturnsTable
                         default => 'gray',
                     }),
                 IconColumn::make('inventory_restored')
+                    ->label(__('Inventory Restored'))
                     ->boolean(),
                 TextColumn::make('processed_at')
+                    ->label(__('Processed At'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
+                    ->label(__('Created At'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('status')
+                    ->label(__('Status'))
                     ->options([
-                        'pending' => 'Pending',
-                        'approved' => 'Approved',
-                        'rejected' => 'Rejected',
-                        'completed' => 'Completed',
+                        'pending' => __('Pending'),
+                        'approved' => __('Approved'),
+                        'rejected' => __('Rejected'),
+                        'completed' => __('Completed'),
                     ]),
             ])
             ->recordActions([

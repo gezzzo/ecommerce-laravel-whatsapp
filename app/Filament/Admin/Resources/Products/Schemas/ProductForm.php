@@ -3,26 +3,21 @@
 namespace App\Filament\Admin\Resources\Products\Schemas;
 
 use App\Models\Color;
+use App\Models\Product;
 use App\Models\Size;
-use App\Models\SkuCode;
 use App\Support\ImageUploadHelper;
 use Filament\Actions\Action;
-use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-
-use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Illuminate\Mail\Markdown;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
@@ -35,6 +30,7 @@ class ProductForm
                 Section::make(__('Basic Information'))
                     ->schema([
                         TextInput::make('name')
+                            ->label(__('Name'))
                             ->required()
                             ->columnSpanFull()
                             ->maxLength(255)
@@ -46,8 +42,8 @@ class ProductForm
                                     // Ensure uniqueness
                                     $originalSlug = $slug;
                                     $counter = 1;
-                                    while (\App\Models\Product::withTrashed()->where('slug', $slug)->exists()) {
-                                        $slug = $originalSlug . '-' . $counter;
+                                    while (Product::withTrashed()->where('slug', $slug)->exists()) {
+                                        $slug = $originalSlug.'-'.$counter;
                                         $counter++;
                                     }
 
@@ -55,17 +51,20 @@ class ProductForm
                                 }
                             }),
                         Select::make('category_id')
+                            ->label(__('Category'))
                             ->relationship('category', 'name')
                             ->required()
                             ->searchable()
                             ->preload(),
 
                         TextInput::make('slug')
+                            ->label(__('Slug'))
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true)
                             ->helperText(__('Auto-generated from the product name')),
                         RichEditor::make('description')
+                            ->label(__('Description'))
                             ->required()
                             ->columnSpanFull(),
                     ])
@@ -73,9 +72,11 @@ class ProductForm
                 Section::make(__('Media'))
                     ->schema([
                         ImageUploadHelper::make('thumbnail')
+                            ->label(__('Thumbnail'))
                             ->required()
                             ->directory('products/thumbnails'),
                         ImageUploadHelper::make('image')
+                            ->label(__('Image'))
                             ->required()
                             ->directory('products'),
                     ])
@@ -83,10 +84,13 @@ class ProductForm
                 Section::make(__('Settings'))
                     ->schema([
                         Toggle::make('is_active')
+                            ->label(__('Active'))
                             ->default(true),
                         Toggle::make('is_featured')
+                            ->label(__('Featured'))
                             ->default(false),
                         Toggle::make('has_variants')
+                            ->label(__('Has Variants'))
                             ->default(false)
                             ->live(),
                     ])
@@ -94,12 +98,14 @@ class ProductForm
                 Section::make(__('Pricing'))
                     ->schema([
                         TextInput::make('selling_price')
+                            ->label(__('Selling Price'))
                             ->required()
                             ->numeric()
-                            ->prefix('$'),
+                            ->prefix(__('MAD')),
                         TextInput::make('price_before_discount')
+                            ->label(__('Price Before Discount'))
                             ->numeric()
-                            ->prefix('$'),
+                            ->prefix(__('MAD')),
                     ])
                     ->columns(2),
 
@@ -116,8 +122,6 @@ class ProductForm
                     ])
                     ->columns(2)
                     ->visible(fn (Get $get): bool => ! (bool) $get('has_variants')),
-
-
 
                 // ── Variant Generation Section ──
                 Section::make(__('Generate Color × Size Combinations'))
@@ -155,7 +159,7 @@ class ProductForm
                             ->searchable()
                             ->preload(),
                         Placeholder::make('combinations_preview')
-                            ->label('')
+                            ->hiddenLabel()
                             ->content(function (Get $get): HtmlString {
                                 $colors = $get('variant_colors') ?? [];
                                 $sizes = $get('variant_sizes') ?? [];
@@ -163,16 +167,21 @@ class ProductForm
                                 $sizeCount = count($sizes);
 
                                 if ($colorCount === 0 && $sizeCount === 0) {
-                                    return new HtmlString('<span style="color: #6b7280;">Select colors and/or sizes to preview combinations</span>');
+                                    return new HtmlString('<span style="color: #6b7280;">'.__('Select colors and/or sizes to preview combinations').'</span>');
                                 }
 
                                 $total = max($colorCount, 1) * max($sizeCount, 1);
+                                $message = __('This will generate :colors color(s) × :sizes size(s) = :total combination(s)', [
+                                    'colors' => $colorCount,
+                                    'sizes' => $sizeCount,
+                                    'total' => $total,
+                                ]);
 
                                 return new HtmlString(
                                     '<div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 10px 16px; text-align: center;">'
-                                    . '<span style="color: #ea580c; font-weight: 600;">'
-                                    . "This will generate <strong>{$colorCount}</strong> color(s) × <strong>{$sizeCount}</strong> size(s) = <strong>{$total}</strong> combination(s)"
-                                    . '</span></div>'
+                                    .'<span style="color: #ea580c; font-weight: 600;">'
+                                    .e($message)
+                                    .'</span></div>'
                                 );
                             })
                             ->columnSpanFull()
@@ -194,7 +203,7 @@ class ProductForm
                                     // Build a set of existing color-size combos to avoid duplicates
                                     $existingCombos = [];
                                     foreach ($existing as $v) {
-                                        $existingCombos[] = ($v['color_id'] ?? '') . '-' . ($v['size_id'] ?? '');
+                                        $existingCombos[] = ($v['color_id'] ?? '').'-'.($v['size_id'] ?? '');
                                     }
 
                                     if (empty($colorIds) && empty($sizeIds)) {
@@ -206,7 +215,7 @@ class ProductForm
 
                                     foreach ($colorList as $colorId) {
                                         foreach ($sizeList as $sizeId) {
-                                            $combo = ($colorId ?? '') . '-' . ($sizeId ?? '');
+                                            $combo = ($colorId ?? '').'-'.($sizeId ?? '');
                                             if (in_array($combo, $existingCombos)) {
                                                 continue;
                                             }
@@ -238,20 +247,22 @@ class ProductForm
                     ->columns(4)
                     ->collapsible()
                     ->visible(fn (Get $get): bool => (bool) $get('has_variants'))
-                ->columnSpanFull()
-                ,
+                    ->columnSpanFull(),
 
                 // ── Product Variants Repeater ──
                 Section::make(__('Product Variants'))
                     ->schema([
                         Repeater::make('variants')
+                            ->label(__('Variants'))
                             ->relationship()
                             ->schema([
                                 Select::make('color_id')
+                                    ->label(__('Color'))
                                     ->relationship('color', 'name')
                                     ->searchable()
                                     ->preload(),
                                 Select::make('size_id')
+                                    ->label(__('Size'))
                                     ->relationship('size', 'name')
                                     ->searchable()
                                     ->preload(),
@@ -262,17 +273,21 @@ class ProductForm
                                     ->minValue(0)
                                     ->dehydrated(false),
                                 TextInput::make('cost_price')
+                                    ->label(__('Cost Price'))
                                     ->numeric()
-                                    ->prefix('$')
+                                    ->prefix(__('MAD'))
                                     ->default(0),
                                 TextInput::make('price_before_discount')
+                                    ->label(__('Price Before Discount'))
                                     ->numeric()
-                                    ->prefix('$'),
+                                    ->prefix(__('MAD')),
                                 TextInput::make('selling_price')
+                                    ->label(__('Selling Price'))
                                     ->numeric()
                                     ->required()
-                                    ->prefix('$'),
+                                    ->prefix(__('MAD')),
                                 ImageUploadHelper::make('image')
+                                    ->label(__('Image'))
                                     ->directory('variants'),
                             ])
                             ->columns(4)
@@ -299,7 +314,7 @@ class ProductForm
                             }),
                     ])
                     ->visible(fn (Get $get): bool => (bool) $get('has_variants'))
-                ->columnSpanFull(),
+                    ->columnSpanFull(),
             ]);
     }
 }

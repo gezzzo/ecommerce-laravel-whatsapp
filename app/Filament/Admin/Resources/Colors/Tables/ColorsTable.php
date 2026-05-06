@@ -19,6 +19,7 @@ class ColorsTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 ColorColumn::make('hex_code')
@@ -28,6 +29,7 @@ class ColorsTable
                     ->label(__('Variants'))
                     ->sortable(),
                 TextColumn::make('created_at')
+                    ->label(__('Created At'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

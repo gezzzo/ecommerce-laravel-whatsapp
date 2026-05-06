@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Category;
+use App\Models\StoreSetting;
 use App\Models\Wishlist;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -22,11 +23,22 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        View::composer(['layouts.app', 'pages.contact'], function ($view) {
+            $view->with('storeName', StoreSetting::storeName());
+            $view->with('contactInfo', StoreSetting::contactInfo());
+        });
+
         View::composer('layouts.app', function ($view) {
             $wishlistSkuCodes = $this->currentWishlistSkuCodes();
 
             $view->with('navCategories', Category::orderBy('sort_order')->limit(8)->get());
             $view->with('wishlistCount', count($wishlistSkuCodes));
+            $view->with('announcementBarText', StoreSetting::announcementBarText());
+        });
+
+        View::composer('home', function ($view) {
+            $view->with('homeFeatures', StoreSetting::homeFeatures());
+            $view->with('promoBanner', StoreSetting::promoBanner());
         });
 
         View::composer('partials.product-card', function ($view) {

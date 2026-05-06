@@ -4,11 +4,9 @@ namespace App\Filament\Admin\Resources\Inventories\Tables;
 
 use App\Enums\InventoryMovementType;
 use App\Models\Inventory;
-use App\Models\InventoryMovement;
 use App\Models\Product;
 use App\Models\Variant;
 use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -49,7 +47,7 @@ class InventoriesTable
                             return $model->name;
                         }
                         if ($model instanceof Variant) {
-                            $parts = [$model->product?->name ?? 'N/A'];
+                            $parts = [$model->product?->name ?? __('Unknown')];
                             if ($model->color) {
                                 $parts[] = $model->color->name;
                             }
@@ -60,7 +58,7 @@ class InventoriesTable
                             return implode(' / ', $parts);
                         }
 
-                        return 'N/A';
+                        return __('Unknown');
                     })
                     ->searchable(query: function ($query, string $search) {
                         $query->where(function ($q) use ($search) {
@@ -135,7 +133,7 @@ class InventoriesTable
                         Notification::make()
                             ->success()
                             ->title(__('Stock imported successfully'))
-                            ->body("Added {$data['quantity']} units")
+                            ->body(__('Added :quantity units', ['quantity' => $data['quantity']]))
                             ->send();
                     }),
                 Action::make('deduct_stock')
@@ -166,7 +164,10 @@ class InventoriesTable
                             Notification::make()
                                 ->danger()
                                 ->title(__('Insufficient stock'))
-                                ->body("Current stock is {$record->quantity}, cannot deduct {$deductQty}")
+                                ->body(__('Current stock is :stock, cannot deduct :quantity', [
+                                    'stock' => $record->quantity,
+                                    'quantity' => $deductQty,
+                                ]))
                                 ->send();
 
                             return;
@@ -184,7 +185,7 @@ class InventoriesTable
                         Notification::make()
                             ->success()
                             ->title(__('Stock deducted successfully'))
-                            ->body("Removed {$deductQty} units")
+                            ->body(__('Removed :quantity units', ['quantity' => $deductQty]))
                             ->send();
                     }),
             ])

@@ -12,9 +12,11 @@ class SizeForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label(__('Name'))
                     ->required()
                     ->maxLength(255),
                 TextInput::make('type')
+                    ->label(__('Type'))
                     ->maxLength(255),
             ]);
     }

@@ -22,8 +22,10 @@ class ProductsTable
         return $table
             ->columns([
                 ImageColumn::make('thumbnail')
+                    ->label(__('Thumbnail'))
                     ->circular(),
                 TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('skuCode.sku_code')
@@ -33,21 +35,27 @@ class ProductsTable
                     ->color('info')
                     ->copyable(),
                 TextColumn::make('category.name')
+                    ->label(__('Category'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('selling_price')
+                    ->label(__('Selling Price'))
                     ->money('MAD')
                     ->sortable(),
                 TextColumn::make('price_before_discount')
+                    ->label(__('Price Before Discount'))
                     ->money('MAD')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('has_variants')
+                    ->label(__('Has Variants'))
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_active')
+                    ->label(__('Active'))
                     ->boolean(),
                 IconColumn::make('is_featured')
+                    ->label(__('Featured'))
                     ->boolean(),
                 TextColumn::make('variants_count')
                     ->counts('variants')
@@ -64,6 +72,7 @@ class ProductsTable
                         default => 'success',
                     }),
                 TextColumn::make('created_at')
+                    ->label(__('Created At'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -71,9 +80,12 @@ class ProductsTable
             ->filters([
                 TrashedFilter::make(),
                 SelectFilter::make('category')
+                    ->label(__('Category'))
                     ->relationship('category', 'name'),
-                TernaryFilter::make('is_active'),
-                TernaryFilter::make('is_featured'),
+                TernaryFilter::make('is_active')
+                    ->label(__('Active')),
+                TernaryFilter::make('is_featured')
+                    ->label(__('Featured')),
             ])
             ->recordActions([
                 EditAction::make(),

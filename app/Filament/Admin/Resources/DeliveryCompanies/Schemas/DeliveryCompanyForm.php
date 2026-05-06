@@ -14,15 +14,19 @@ class DeliveryCompanyForm
         return $schema
             ->components([
                 Select::make('delivery_provider_id')
+                    ->label(__('Provider'))
                     ->relationship('provider', 'name')
                     ->required()
                     ->searchable()
                     ->preload(),
                 TextInput::make('api_token')
+                    ->label(__('API Token'))
                     ->maxLength(255),
                 TextInput::make('client_key')
+                    ->label(__('Client Key'))
                     ->maxLength(255),
                 Toggle::make('is_active')
+                    ->label(__('Active'))
                     ->default(true),
             ]);
     }

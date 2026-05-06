@@ -1,3 +1,17 @@
+@php
+    $siteName = $storeName ?? \App\Models\StoreSetting::storeName();
+    $siteContactInfo = $contactInfo ?? \App\Models\StoreSetting::contactInfo();
+    $sitePhone = $siteContactInfo['phone'] ?? '';
+    $siteEmail = $siteContactInfo['email'] ?? '';
+    $siteWorkingHours = $siteContactInfo['working_hours'] ?? '';
+    $sitePhoneHref = filled($sitePhone) ? 'tel:' . preg_replace('/[^\d+]/', '', $sitePhone) : null;
+    $siteEmailHref = filled($siteEmail) ? 'mailto:' . $siteEmail : null;
+    $siteSocialLinks = [
+        ['label' => 'f', 'name' => 'Facebook', 'url' => $siteContactInfo['facebook_url'] ?? ''],
+        ['label' => 'in', 'name' => 'Instagram', 'url' => $siteContactInfo['instagram_url'] ?? ''],
+        ['label' => 'tw', 'name' => 'Twitter', 'url' => $siteContactInfo['twitter_url'] ?? ''],
+    ];
+@endphp
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -6,26 +20,26 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- SEO Meta Tags --}}
-    <title>@yield('title', config('app.name', 'متجري') . ' - تسوق أفضل المنتجات')</title>
-    <meta name="description" content="@yield('meta_description', 'متجري - متجرك الإلكتروني الأول لأفضل المنتجات بأسعار منافسة وشحن سريع لجميع أنحاء مصر. عروض يومية وخصومات حصرية.')">
-    <meta name="keywords" content="@yield('meta_keywords', 'تسوق, منتجات, عروض, خصومات, شحن مجاني, متجر إلكتروني, مصر')">
+    <title>@yield('title', $siteName . ' - تسوق أفضل المنتجات')</title>
+    <meta name="description" content="@yield('meta_description', $siteName . ' - متجرك الإلكتروني الأول لأفضل المنتجات بأسعار منافسة وشحن سريع للمغرب العربي. عروض يومية وخصومات حصرية.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'تسوق, منتجات, عروض, خصومات, شحن مجاني, متجر إلكتروني, المغرب العربي')">
     <meta name="robots" content="index, follow">
-    <meta name="author" content="{{ config('app.name', 'متجري') }}">
+    <meta name="author" content="{{ $siteName }}">
     <link rel="canonical" href="{{ url()->current() }}">
 
     {{-- Open Graph --}}
     <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="@yield('og_title', config('app.name', 'متجري'))">
-    <meta property="og:description" content="@yield('meta_description', 'متجري - أفضل المنتجات بأسعار منافسة وشحن سريع')">
+    <meta property="og:title" content="@yield('og_title', $siteName)">
+    <meta property="og:description" content="@yield('meta_description', $siteName . ' - أفضل المنتجات بأسعار منافسة وشحن سريع')">
     <meta property="og:image" content="@yield('og_image', asset('images/og-default.png'))">
-    <meta property="og:locale" content="ar_EG">
-    <meta property="og:site_name" content="{{ config('app.name', 'متجري') }}">
+    <meta property="og:locale" content="ar_MA">
+    <meta property="og:site_name" content="{{ $siteName }}">
 
     {{-- Twitter Card --}}
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('og_title', config('app.name', 'متجري'))">
-    <meta name="twitter:description" content="@yield('meta_description', 'متجري - أفضل المنتجات بأسعار منافسة وشحن سريع')">
+    <meta name="twitter:title" content="@yield('og_title', $siteName)">
+    <meta name="twitter:description" content="@yield('meta_description', $siteName . ' - أفضل المنتجات بأسعار منافسة وشحن سريع')">
     <meta name="twitter:image" content="@yield('og_image', asset('images/og-default.png'))">
 
     {{-- Structured Data - Organization --}}
@@ -33,12 +47,13 @@
     {
         "@@context": "https://schema.org",
         "@@type": "Organization",
-        "name": "{{ config('app.name', 'متجري') }}",
-        "url": "{{ url('/') }}",
-        "logo": "{{ asset('images/logo.png') }}",
+        "name": @json($siteName),
+        "url": @json(url('/')),
+        "logo": @json(asset('images/logo.png')),
+        "email": @json($siteEmail),
         "contactPoint": {
             "@@type": "ContactPoint",
-            "telephone": "+20-1000000000",
+            "telephone": @json($sitePhone),
             "contactType": "customer service",
             "availableLanguage": "Arabic"
         }
@@ -50,8 +65,8 @@
     {
         "@@context": "https://schema.org",
         "@@type": "WebSite",
-        "url": "{{ url('/') }}",
-        "name": "{{ config('app.name', 'متجري') }}",
+        "url": @json(url('/')),
+        "name": @json($siteName),
         "potentialAction": {
             "@@type": "SearchAction",
             "target": "{{ route('search') }}?q={search_term_string}",
@@ -127,9 +142,11 @@
 <body class="bg-gray-50 text-gray-800">
 
     {{-- Top bar --}}
+    @if(filled($announcementBarText ?? null))
     <div class="bg-primary-600 text-white text-center text-sm py-2 px-4">
-        <span>🎉 شحن مجاني على الطلبات فوق 200 درهم! استخدم كود: <strong>FREESHIP</strong></span>
+        <span>{{ $announcementBarText }}</span>
     </div>
+    @endif
 
     {{-- Navbar --}}
     <header class="bg-white shadow-sm sticky top-0 z-50" role="banner">
@@ -138,10 +155,7 @@
 
                 {{-- Logo --}}
                 <a href="{{ route('home') }}" class="flex items-center gap-2 shrink-0" aria-label="الصفحة الرئيسية">
-                    <div class="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center">
-                        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                    </div>
-                    <span class="text-xl font-bold text-gray-900">متجري</span>
+                    <img src="{{ asset('images/logo.png') }}" alt="{{ $siteName }}" class="h-12 w-auto">
                 </a>
 
                 {{-- Search --}}
@@ -230,10 +244,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
                 <div class="flex items-center gap-2 mb-4">
-                    <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                    </div>
-                    <span class="text-white font-bold text-lg">متجري</span>
+                    <img src="{{ asset('images/logo.png') }}" alt="{{ $siteName }}" class="h-8 w-auto">
+                    <span class="text-white font-bold text-lg">{{ $siteName }}</span>
                 </div>
                 <p class="text-sm leading-relaxed">متجرك الإلكتروني الأول لأفضل المنتجات بأسعار منافسة وشحن سريع.</p>
             </div>
@@ -258,19 +270,27 @@
             <div>
                 <h4 class="text-white font-semibold mb-4">تواصل معنا</h4>
                 <ul class="space-y-2 text-sm">
-                    <li>📞 01000000000</li>
-                    <li>📧 info@mystore.com</li>
-                    <li>⏰ يومياً 9ص - 10م</li>
+                    @if(filled($sitePhone))
+                    <li>📞 <a href="{{ $sitePhoneHref }}" class="hover:text-white">{{ $sitePhone }}</a></li>
+                    @endif
+                    @if(filled($siteEmail))
+                    <li>📧 <a href="{{ $siteEmailHref }}" class="hover:text-white">{{ $siteEmail }}</a></li>
+                    @endif
+                    @if(filled($siteWorkingHours))
+                    <li>⏰ {{ $siteWorkingHours }}</li>
+                    @endif
                 </ul>
                 <div class="flex gap-3 mt-4">
-                    <a href="#" class="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center hover:bg-primary-600 transition-colors text-xs" aria-label="Facebook">f</a>
-                    <a href="#" class="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center hover:bg-primary-600 transition-colors text-xs" aria-label="Instagram">in</a>
-                    <a href="#" class="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center hover:bg-primary-600 transition-colors text-xs" aria-label="Twitter">tw</a>
+                    @foreach($siteSocialLinks as $socialLink)
+                        @if(filled($socialLink['url']))
+                        <a href="{{ $socialLink['url'] }}" class="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center hover:bg-primary-600 transition-colors text-xs" aria-label="{{ $socialLink['name'] }}" target="_blank" rel="noopener">{{ $socialLink['label'] }}</a>
+                        @endif
+                    @endforeach
                 </div>
             </div>
         </div>
         <div class="border-t border-gray-800 text-center py-4 text-xs text-gray-500">
-            © {{ date('Y') }} متجري. جميع الحقوق محفوظة.
+            © {{ date('Y') }} {{ $siteName }}. جميع الحقوق محفوظة.
         </div>
     </footer>
 

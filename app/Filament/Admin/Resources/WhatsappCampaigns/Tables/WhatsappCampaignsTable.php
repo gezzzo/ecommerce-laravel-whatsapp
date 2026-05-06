@@ -69,6 +69,7 @@ class WhatsappCampaignsTable
             ])
             ->filters([
                 SelectFilter::make('status')
+                    ->label(__('Status'))
                     ->options(collect(WhatsappCampaignStatus::cases())->mapWithKeys(
                         fn ($case) => [$case->value => $case->label()]
                     )),

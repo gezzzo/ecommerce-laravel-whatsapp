@@ -22,9 +22,11 @@ class DeliveryZonesTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('city')
+                    ->label(__('City'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('delivery_fee')
+                    ->label(__('Delivery Fee'))
                     ->money('MAD')
                     ->sortable(),
                 TextColumn::make('external_city_id')
@@ -35,6 +37,7 @@ class DeliveryZonesTable
                     ->label(__('Orders'))
                     ->sortable(),
                 TextColumn::make('created_at')
+                    ->label(__('Created At'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

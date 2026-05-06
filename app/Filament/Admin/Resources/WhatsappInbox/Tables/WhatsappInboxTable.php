@@ -17,7 +17,7 @@ class WhatsappInboxTable
         return $table
             ->columns([
                 IconColumn::make('is_read')
-                    ->label('')
+                    ->label(__('Read'))
                     ->boolean()
                     ->trueIcon('heroicon-o-envelope-open')
                     ->falseIcon('heroicon-o-envelope')
@@ -74,13 +74,14 @@ class WhatsappInboxTable
                     ->toggle(),
 
                 SelectFilter::make('message_type')
+                    ->label(__('Message Type'))
                     ->options([
-                        'text' => 'Text',
-                        'image' => 'Image',
-                        'audio' => 'Audio',
-                        'video' => 'Video',
-                        'document' => 'Document',
-                        'unknown' => 'Other',
+                        'text' => __('Text'),
+                        'image' => __('Image'),
+                        'audio' => __('Audio'),
+                        'video' => __('Video'),
+                        'document' => __('Document'),
+                        'unknown' => __('Other'),
                     ]),
 
                 SelectFilter::make('whatsapp_session_id')

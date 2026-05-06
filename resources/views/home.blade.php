@@ -64,24 +64,21 @@
 </section>
 
 {{-- ===== FEATURES BAR ===== --}}
+@if(! empty($homeFeatures))
 <section class="bg-white border-b border-gray-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-        @foreach([
-            ['icon' => '🚚', 'title' => 'شحن مجاني', 'sub' => 'على طلبات +200 درهم'],
-            ['icon' => '🔄', 'title' => 'إرجاع مجاني', 'sub' => 'خلال 30 يوم'],
-            ['icon' => '🔒', 'title' => 'دفع آمن', 'sub' => '100% مضمون'],
-            ['icon' => '📞', 'title' => 'دعم 24/7', 'sub' => 'خدمة متواصلة'],
-        ] as $feature)
+        @foreach($homeFeatures as $feature)
         <div class="flex items-center gap-3">
             <div class="text-2xl">{{ $feature['icon'] }}</div>
             <div>
                 <div class="font-semibold text-gray-800 text-sm">{{ $feature['title'] }}</div>
-                <div class="text-xs text-gray-500">{{ $feature['sub'] }}</div>
+                <div class="text-xs text-gray-500">{{ $feature['subtitle'] }}</div>
             </div>
         </div>
         @endforeach
     </div>
 </section>
+@endif
 
 {{-- ===== CATEGORIES ===== --}}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-12" aria-label="الفئات">
@@ -89,22 +86,22 @@
         <h2 class="text-2xl font-bold text-gray-900">تسوق حسب الفئة</h2>
         <a href="{{ route('categories') }}" class="text-primary-600 text-sm font-medium hover:underline">عرض الكل ←</a>
     </div>
-    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+    <div class="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory sm:grid sm:grid-cols-4 md:grid-cols-6 sm:overflow-visible sm:pb-0">
         @forelse($categories ?? [] as $category)
         <a href="{{ route('category', $category->slug) }}"
-           class="flex flex-col items-center gap-2 p-4 bg-white rounded-2xl border border-gray-100 hover:border-primary-200 hover:bg-primary-50 transition-colors card-hover text-center">
+           class="min-w-[9.5rem] sm:min-w-0 flex flex-col items-center gap-3 p-4 sm:p-5 bg-white rounded-2xl border border-gray-100 hover:border-primary-200 hover:bg-primary-50 transition-colors card-hover text-center snap-start">
             @if($category->icon)
-            <img src="{{ asset('storage/' . $category->icon) }}" alt="{{ $category->name }}" class="w-10 h-10 object-contain">
+            <img src="{{ asset('storage/' . $category->icon) }}" alt="{{ $category->name }}" class="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded-xl">
             @else
-            <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center text-xl">🛍️</div>
+            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-primary-100 rounded-xl flex items-center justify-center text-3xl">🛍️</div>
             @endif
             <span class="text-xs font-medium text-gray-700">{{ $category->name }}</span>
             <span class="text-xs text-gray-400">({{ $category->products_count }})</span>
         </a>
         @empty
         @foreach([['emoji' => '👗', 'name' => 'أزياء'], ['emoji' => '💻', 'name' => 'إلكترونيات'], ['emoji' => '🏠', 'name' => 'المنزل'], ['emoji' => '💄', 'name' => 'جمال'], ['emoji' => '📱', 'name' => 'هواتف'], ['emoji' => '🎮', 'name' => 'ألعاب']] as $ph)
-        <a href="#" class="flex flex-col items-center gap-2 p-4 bg-white rounded-2xl border border-gray-100 hover:border-primary-200 hover:bg-primary-50 transition-colors card-hover text-center">
-            <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center text-2xl">{{ $ph['emoji'] }}</div>
+        <a href="#" class="min-w-[9.5rem] sm:min-w-0 flex flex-col items-center gap-3 p-4 sm:p-5 bg-white rounded-2xl border border-gray-100 hover:border-primary-200 hover:bg-primary-50 transition-colors card-hover text-center snap-start">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-primary-100 rounded-xl flex items-center justify-center text-3xl">{{ $ph['emoji'] }}</div>
             <span class="text-xs font-medium text-gray-700">{{ $ph['name'] }}</span>
         </a>
         @endforeach
@@ -145,9 +142,11 @@
     <div class="bg-gradient-to-l from-primary-600 to-primary-800 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6 text-white overflow-hidden relative">
         <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px); background-size: 40px 40px;"></div>
         <div class="relative z-10">
-            <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium mb-3 inline-block">عرض محدود الوقت ⏰</span>
-            <h2 class="text-3xl font-extrabold mb-2">خصم حتى 70%</h2>
-            <p class="text-primary-100 text-lg">على منتجات الأزياء المغربية بمناسبة العيد الاضحي المبارك</p>
+            @if(filled($promoBanner['badge'] ?? null))
+            <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium mb-3 inline-block">{{ $promoBanner['badge'] }}</span>
+            @endif
+            <h2 class="text-3xl font-extrabold mb-2">{{ $promoBanner['title'] ?? '' }}</h2>
+            <p class="text-primary-100 text-lg">{{ $promoBanner['subtitle'] ?? '' }}</p>
         </div>
         <a href="{{ route('offers') }}" class="relative z-10 bg-white text-primary-700 font-bold px-8 py-3 rounded-xl hover:bg-primary-50 transition-colors shrink-0" id="promo-banner-cta">
             اشترِ الآن

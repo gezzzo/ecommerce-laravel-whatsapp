@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -11,33 +13,10 @@ class ProductController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Product::with(['category', 'inventory', 'skuCode', 'variants.skuCode'])
-            ->where('is_active', true);
+        $products = $this->applyFilters($this->productsQuery(), $request)
+            ->paginate(20);
 
-        if ($request->filled('categories')) {
-            $query->whereIn('category_id', $request->input('categories'));
-        }
-
-        if ($request->filled('min_price')) {
-            $query->where('selling_price', '>=', $request->input('min_price'));
-        }
-
-        if ($request->filled('max_price')) {
-            $query->where('selling_price', '<=', $request->input('max_price'));
-        }
-
-        $query = match ($request->input('sort')) {
-            'newest'     => $query->latest(),
-            'price_asc'  => $query->orderBy('selling_price'),
-            'price_desc' => $query->orderByDesc('selling_price'),
-            default      => $query->latest('id'),
-        };
-
-        $products = $query->paginate(20);
-
-        $sidebarCategories = Category::withCount('products')
-            ->orderBy('sort_order')
-            ->get();
+        $sidebarCategories = $this->sidebarCategories();
 
         return view('products.index', compact('products', 'sidebarCategories'));
     }
@@ -73,17 +52,17 @@ class ProductController extends Controller
     {
         $query = $request->input('q', '');
 
-        $products = Product::with(['category', 'inventory', 'skuCode', 'variants.skuCode'])
-            ->where('is_active', true)
-            ->where(function ($q) use ($query) {
-                $q->where('name', 'like', "%{$query}%")
-                    ->orWhere('description', 'like', "%{$query}%");
-            })
+        $products = $this->applyFilters(
+            $this->productsQuery()
+                ->where(function ($q) use ($query) {
+                    $q->where('name', 'like', "%{$query}%")
+                        ->orWhere('description', 'like', "%{$query}%");
+                }),
+            $request
+        )
             ->paginate(20);
 
-        $sidebarCategories = Category::withCount('products')
-            ->orderBy('sort_order')
-            ->get();
+        $sidebarCategories = $this->sidebarCategories();
 
         return view('products.index', [
             'products' => $products,
@@ -92,18 +71,17 @@ class ProductController extends Controller
         ]);
     }
 
-    public function offers(): View
+    public function offers(Request $request): View
     {
-        $products = Product::with(['category', 'inventory', 'skuCode', 'variants.skuCode'])
-            ->where('is_active', true)
-            ->whereNotNull('price_before_discount')
-            ->whereColumn('price_before_discount', '>', 'selling_price')
-            ->latest()
+        $products = $this->applyFilters(
+            $this->productsQuery()
+                ->whereNotNull('price_before_discount')
+                ->whereColumn('price_before_discount', '>', 'selling_price'),
+            $request
+        )
             ->paginate(20);
 
-        $sidebarCategories = Category::withCount('products')
-            ->orderBy('sort_order')
-            ->get();
+        $sidebarCategories = $this->sidebarCategories();
 
         return view('products.index', [
             'products' => $products,
@@ -121,24 +99,64 @@ class ProductController extends Controller
         return view('home', compact('categories'));
     }
 
-    public function category(string $slug): View
+    public function category(Request $request, string $slug): View
     {
         $category = Category::where('slug', $slug)->firstOrFail();
 
-        $products = Product::with(['category', 'inventory', 'skuCode', 'variants.skuCode'])
-            ->where('is_active', true)
-            ->where('category_id', $category->id)
-            ->latest()
+        $products = $this->applyFilters($this->productsQuery(), $request, $category->id)
             ->paginate(20);
 
-        $sidebarCategories = Category::withCount('products')
-            ->orderBy('sort_order')
-            ->get();
+        $sidebarCategories = $this->sidebarCategories();
 
         return view('products.index', [
             'products' => $products,
             'sidebarCategories' => $sidebarCategories,
             'category' => $category,
         ]);
+    }
+
+    private function productsQuery(): Builder
+    {
+        return Product::with(['category', 'inventory', 'skuCode', 'variants.skuCode'])
+            ->where('is_active', true);
+    }
+
+    private function applyFilters(Builder $query, Request $request, ?int $fallbackCategoryId = null): Builder
+    {
+        $categoryIds = collect((array) $request->input('categories', []))
+            ->filter(fn ($categoryId): bool => is_numeric($categoryId))
+            ->map(fn ($categoryId): int => (int) $categoryId)
+            ->values()
+            ->all();
+
+        if ($categoryIds !== []) {
+            $query->whereIn('category_id', $categoryIds);
+        } elseif ($fallbackCategoryId) {
+            $query->where('category_id', $fallbackCategoryId);
+        }
+
+        if (is_numeric($request->input('min_price'))) {
+            $query->where('selling_price', '>=', (float) $request->input('min_price'));
+        }
+
+        if (is_numeric($request->input('max_price'))) {
+            $query->where('selling_price', '<=', (float) $request->input('max_price'));
+        }
+
+        return match ($request->input('sort')) {
+            'newest' => $query->latest(),
+            'price_asc' => $query->orderBy('selling_price'),
+            'price_desc' => $query->orderByDesc('selling_price'),
+            default => $query->latest('id'),
+        };
+    }
+
+    private function sidebarCategories(): Collection
+    {
+        return Category::withCount([
+            'products' => fn (Builder $query) => $query->where('is_active', true),
+        ])
+            ->orderBy('sort_order')
+            ->get();
     }
 }

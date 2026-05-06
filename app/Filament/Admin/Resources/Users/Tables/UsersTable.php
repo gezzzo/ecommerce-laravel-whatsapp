@@ -15,6 +15,7 @@ class UsersTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('phone')
@@ -32,6 +33,7 @@ class UsersTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('email_verified_at')
+                    ->label(__('Email Verified At'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -40,6 +42,7 @@ class UsersTable
                     ->label(__('Orders'))
                     ->sortable(),
                 TextColumn::make('created_at')
+                    ->label(__('Created At'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

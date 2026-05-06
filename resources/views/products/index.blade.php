@@ -28,6 +28,12 @@
 @endpush
 
 @section('content')
+@php
+    $selectedCategoryIds = collect(request('categories', isset($category) ? [$category->id] : []))
+        ->map(fn ($categoryId) => (string) $categoryId)
+        ->all();
+@endphp
+
 <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
 
     {{-- Breadcrumb --}}
@@ -90,7 +96,7 @@
                                 <label class="flex items-center justify-between cursor-pointer text-sm group">
                                     <div class="flex items-center gap-2">
                                         <input type="checkbox" name="categories[]" value="{{ $cat->id }}"
-                                               {{ in_array($cat->id, request('categories', [])) ? 'checked' : '' }}
+                                               {{ in_array((string) $cat->id, $selectedCategoryIds, true) ? 'checked' : '' }}
                                                class="accent-primary-600"
                                                id="filter-cat-{{ $cat->id }}">
                                         <span class="text-gray-700 group-hover:text-primary-600 transition-colors">{{ $cat->name }}</span>
@@ -106,7 +112,7 @@
                     <button type="submit"
                             class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors"
                             id="filter-submit">
-                        تطبيق الفلتر
+                        تطبيق الفلاتر
                     </button>
                 </div>
             </form>

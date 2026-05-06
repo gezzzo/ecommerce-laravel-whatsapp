@@ -13,14 +13,18 @@ class CategoryForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label(__('Name'))
                     ->required()
                     ->maxLength(255),
                 TextInput::make('slug')
+                    ->label(__('Slug'))
                     ->required()
                     ->maxLength(255),
                 ImageUploadHelper::make('icon')
+                    ->label(__('Icon'))
                     ->directory('categories'),
                 TextInput::make('sort_order')
+                    ->label(__('Sort Order'))
                     ->required()
                     ->numeric()
                     ->default(0),

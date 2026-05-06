@@ -4,13 +4,11 @@ namespace App\Filament\Admin\Resources\WhatsappCampaigns\Schemas;
 
 use App\Enums\WhatsappMediaType;
 use App\Models\WhatsappSession;
-use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -56,7 +54,7 @@ class WhatsappCampaignForm
                         ->default(3)
                         ->minValue(1)
                         ->maxValue(60)
-                        ->suffix('sec')
+                        ->suffix(__('sec'))
                         ->helperText(__('Recommended: 3-10 seconds to avoid being blocked.')),
 
                     DateTimePicker::make('scheduled_at')
@@ -102,7 +100,7 @@ class WhatsappCampaignForm
                 ->schema([
                     Repeater::make('contacts')
                         ->relationship()
-                        ->label('')
+                        ->hiddenLabel()
                         ->schema([
                             Grid::make(3)->schema([
                                 TextInput::make('phone')
