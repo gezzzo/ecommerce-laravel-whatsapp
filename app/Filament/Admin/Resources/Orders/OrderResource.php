@@ -7,6 +7,7 @@ use App\Filament\Admin\Resources\Orders\Pages\EditOrder;
 use App\Filament\Admin\Resources\Orders\Pages\ListOrders;
 use App\Filament\Admin\Resources\Orders\Schemas\OrderForm;
 use App\Filament\Admin\Resources\Orders\Tables\OrdersTable;
+use App\Filament\Admin\Resources\Orders\RelationManagers\ItemsRelationManager;
 use App\Models\Order;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -58,7 +59,7 @@ class OrderResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ItemsRelationManager::class,
         ];
     }
 

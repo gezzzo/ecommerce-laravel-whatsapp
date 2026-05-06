@@ -101,6 +101,48 @@
         ];
     })->toJson();
 
+    // Gather all thumbnails including variant colors
+    $allThumbnails = collect();
+    $allThumbnails->push((object)['url' => asset('storage/' . $product->thumbnail), 'color_id' => null]);
+    
+    foreach ($product->images as $img) {
+        $imgUrl = asset('storage/' . $img->image);
+        if (!$allThumbnails->contains('url', $imgUrl)) {
+            $allThumbnails->push((object)['url' => $imgUrl, 'color_id' => null]);
+        }
+    }
+
+    if ($product->has_variants) {
+        foreach ($product->variants as $variant) {
+            if ($variant->image && $variant->color_id) {
+                $variantImgUrl = asset('storage/' . $variant->image);
+                $existing = $allThumbnails->firstWhere('url', $variantImgUrl);
+                if ($existing) {
+                    $existing->color_id = $variant->color_id;
+                } else {
+                    $allThumbnails->push((object)['url' => $variantImgUrl, 'color_id' => $variant->color_id]);
+                }
+            }
+        }
+    }
+
+    // Filter out duplicate colors (keep only one image per color, but keep all null colors)
+    $filteredThumbnails = collect();
+    $seenColors = [];
+
+    foreach ($allThumbnails as $thumb) {
+        if ($thumb->color_id === null) {
+            $filteredThumbnails->push($thumb);
+        } else {
+            if (!in_array($thumb->color_id, $seenColors)) {
+                $filteredThumbnails->push($thumb);
+                $seenColors[] = $thumb->color_id;
+            }
+        }
+    }
+    
+    $allThumbnails = $filteredThumbnails;
+
     $stockQty = $product->has_variants ? null : ($product->inventory?->quantity ?? 0);
     $descriptionHtml = str_replace(['&nbsp;', "\xc2\xa0"], ' ', $product->description ?? '');
     $variantSelectionPrompt = 'أضف للسلة';
@@ -185,16 +227,13 @@
                 </div>
 
                 {{-- Thumbnails --}}
-                @if($product->images->count() > 0)
+                @if($allThumbnails->count() > 1)
                 <div class="flex gap-2 overflow-x-auto pb-1">
-                    <button onclick="changeMainImage('{{ asset('storage/' . $product->thumbnail) }}', this)"
-                            class="gallery-thumb active w-16 h-16 rounded-xl border-2 border-primary-400 overflow-hidden flex-shrink-0 transition-all">
-                        <img src="{{ asset('storage/' . $product->thumbnail) }}" alt="" class="w-full h-full object-cover">
-                    </button>
-                    @foreach($product->images as $img)
-                    <button onclick="changeMainImage('{{ asset('storage/' . $img->image) }}', this)"
-                            class="gallery-thumb w-16 h-16 rounded-xl border-2 border-transparent hover:border-primary-300 overflow-hidden flex-shrink-0 transition-all">
-                        <img src="{{ asset('storage/' . $img->image) }}" alt="" class="w-full h-full object-cover">
+                    @foreach($allThumbnails as $index => $thumb)
+                    <button onclick="changeMainImage('{{ $thumb->url }}', this, {{ $thumb->color_id ?? 'null' }})"
+                            data-img-url="{{ $thumb->url }}"
+                            class="gallery-thumb {{ $index === 0 ? 'active border-primary-400' : 'border-transparent hover:border-primary-300' }} w-16 h-16 rounded-xl border-2 overflow-hidden flex-shrink-0 transition-all">
+                        <img src="{{ $thumb->url }}" alt="" class="w-full h-full object-cover">
                     </button>
                     @endforeach
                 </div>
@@ -566,6 +605,15 @@
 
             if (matched.image) {
                 document.getElementById('mainImage').src = matched.image;
+                document.querySelectorAll('.gallery-thumb').forEach(t => {
+                    t.classList.remove('active', 'border-primary-400');
+                    t.classList.add('border-transparent');
+                    if (t.dataset.imgUrl === matched.image) {
+                        t.classList.add('active', 'border-primary-400');
+                        t.classList.remove('border-transparent');
+                        t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    }
+                });
             }
 
             const stockEl = document.getElementById('stockStatus');
@@ -597,16 +645,53 @@
         inp.value = Math.max(1, Math.min(parseInt(inp.max), val));
     }
 
-    function changeMainImage(src, el) {
+    function changeMainImage(src, el, colorId = null) {
         document.getElementById('mainImage').src = src;
         document.querySelectorAll('.gallery-thumb').forEach(t => {
-            t.classList.remove('active');
-            t.classList.remove('border-primary-400');
+            t.classList.remove('active', 'border-primary-400');
             t.classList.add('border-transparent');
         });
-        el.classList.add('active');
-        el.classList.remove('border-transparent');
-        el.classList.add('border-primary-400');
+        if (el) {
+            el.classList.add('active', 'border-primary-400');
+            el.classList.remove('border-transparent');
+        }
+
+        if (colorId) {
+            if (hasSizes && !selectedSizeId) {
+                const availableVariant = variants.find(v => v.color_id == colorId);
+                if (availableVariant) {
+                    const sizeBtn = document.querySelector(`.size-btn[data-size-id="${availableVariant.size_id}"]`);
+                    if (sizeBtn) {
+                        selectSize(sizeBtn);
+                        setTimeout(() => {
+                            const newSwatch = document.querySelector(`.color-swatch[data-color-id="${colorId}"]`);
+                            if (newSwatch && !newSwatch.disabled) {
+                                selectColor(newSwatch);
+                            }
+                        }, 50);
+                    }
+                }
+            } else {
+                let swatch = document.querySelector(`.color-swatch[data-color-id="${colorId}"]`);
+                if (swatch && !swatch.disabled) {
+                    selectColor(swatch);
+                } else if (hasSizes && selectedSizeId) {
+                    const availableVariant = variants.find(v => v.color_id == colorId);
+                    if (availableVariant && availableVariant.size_id != selectedSizeId) {
+                        const sizeBtn = document.querySelector(`.size-btn[data-size-id="${availableVariant.size_id}"]`);
+                        if (sizeBtn) {
+                            selectSize(sizeBtn);
+                            setTimeout(() => {
+                                const newSwatch = document.querySelector(`.color-swatch[data-color-id="${colorId}"]`);
+                                if (newSwatch && !newSwatch.disabled) {
+                                    selectColor(newSwatch);
+                                }
+                            }, 50);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     function openImageZoom(src) {

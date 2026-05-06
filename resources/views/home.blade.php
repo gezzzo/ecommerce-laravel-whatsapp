@@ -89,20 +89,20 @@
     <div class="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory sm:grid sm:grid-cols-4 md:grid-cols-6 sm:overflow-visible sm:pb-0">
         @forelse($categories ?? [] as $category)
         <a href="{{ route('category', $category->slug) }}"
-           class="min-w-[9.5rem] sm:min-w-0 flex flex-col items-center gap-3 p-4 sm:p-5 bg-white rounded-2xl border border-gray-100 hover:border-primary-200 hover:bg-primary-50 transition-colors card-hover text-center snap-start">
+           class="min-w-[9.5rem] sm:min-w-0 flex flex-col items-center gap-3 p-3 sm:p-4 bg-white rounded-2xl border border-gray-100 hover:border-primary-200 hover:bg-primary-50 transition-colors card-hover text-center snap-start">
             @if($category->icon)
-            <img src="{{ asset('storage/' . $category->icon) }}" alt="{{ $category->name }}" class="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded-xl">
+            <img src="{{ asset('storage/' . $category->icon) }}" alt="{{ $category->name }}" class="w-full aspect-square object-cover rounded-xl shadow-sm">
             @else
-            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-primary-100 rounded-xl flex items-center justify-center text-3xl">🛍️</div>
+            <div class="w-full aspect-square bg-primary-100 rounded-xl flex items-center justify-center text-4xl shadow-sm">🛍️</div>
             @endif
-            <span class="text-xs font-medium text-gray-700">{{ $category->name }}</span>
+            <span class="text-sm font-bold text-gray-800">{{ $category->name }}</span>
             <span class="text-xs text-gray-400">({{ $category->products_count }})</span>
         </a>
         @empty
         @foreach([['emoji' => '👗', 'name' => 'أزياء'], ['emoji' => '💻', 'name' => 'إلكترونيات'], ['emoji' => '🏠', 'name' => 'المنزل'], ['emoji' => '💄', 'name' => 'جمال'], ['emoji' => '📱', 'name' => 'هواتف'], ['emoji' => '🎮', 'name' => 'ألعاب']] as $ph)
-        <a href="#" class="min-w-[9.5rem] sm:min-w-0 flex flex-col items-center gap-3 p-4 sm:p-5 bg-white rounded-2xl border border-gray-100 hover:border-primary-200 hover:bg-primary-50 transition-colors card-hover text-center snap-start">
-            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-primary-100 rounded-xl flex items-center justify-center text-3xl">{{ $ph['emoji'] }}</div>
-            <span class="text-xs font-medium text-gray-700">{{ $ph['name'] }}</span>
+        <a href="#" class="min-w-[9.5rem] sm:min-w-0 flex flex-col items-center gap-3 p-3 sm:p-4 bg-white rounded-2xl border border-gray-100 hover:border-primary-200 hover:bg-primary-50 transition-colors card-hover text-center snap-start">
+            <div class="w-full aspect-square bg-primary-100 rounded-xl flex items-center justify-center text-4xl shadow-sm">{{ $ph['emoji'] }}</div>
+            <span class="text-sm font-bold text-gray-800">{{ $ph['name'] }}</span>
         </a>
         @endforeach
         @endforelse
