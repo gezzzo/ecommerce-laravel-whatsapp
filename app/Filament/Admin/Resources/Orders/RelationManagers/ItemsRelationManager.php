@@ -86,10 +86,10 @@ class ItemsRelationManager extends RelationManager
                     ->numeric(),
                 TextColumn::make('price')
                     ->label(__('Price'))
-                    ->money('MAD'),
+                    ->money('MAD', locale: 'en'),
                 TextColumn::make('total')
                     ->label(__('Total'))
-                    ->money('MAD'),
+                    ->money('MAD', locale: 'en'),
             ])
             ->filters([
                 //

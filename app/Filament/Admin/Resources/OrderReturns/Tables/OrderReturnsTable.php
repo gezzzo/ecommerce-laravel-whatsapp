@@ -29,7 +29,7 @@ class OrderReturnsTable
                     ->sortable(),
                 TextColumn::make('refund_amount')
                     ->label(__('Refund Amount'))
-                    ->money('MAD')
+                    ->money('MAD', locale: 'en')
                     ->sortable(),
                 TextColumn::make('status')
                     ->label(__('Status'))

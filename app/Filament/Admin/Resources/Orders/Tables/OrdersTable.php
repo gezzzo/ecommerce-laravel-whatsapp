@@ -82,7 +82,7 @@ class OrdersTable
                     ->badge(),
                 TextColumn::make('total')
                     ->label(__('Total'))
-                    ->money('MAD')
+                    ->money('MAD', locale: 'en')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('Created At'))

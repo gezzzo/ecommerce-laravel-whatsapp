@@ -88,16 +88,16 @@ class VariantsRelationManager extends RelationManager
                     ->color(fn ($state): string => $state > 0 ? 'success' : 'danger'),
                 TextColumn::make('cost_price')
                     ->label(__('Cost Price'))
-                    ->money('MAD')
+                    ->money('MAD', locale: 'en')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('selling_price')
                     ->label(__('Selling Price'))
-                    ->money('MAD')
+                    ->money('MAD', locale: 'en')
                     ->sortable(),
                 TextColumn::make('price_before_discount')
                     ->label(__('Price Before Discount'))
-                    ->money('MAD')
+                    ->money('MAD', locale: 'en')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 ImageColumn::make('image')

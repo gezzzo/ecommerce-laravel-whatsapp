@@ -59,7 +59,7 @@ class ProductsRelationManager extends RelationManager
                     ->sortable(),
                 TextColumn::make('selling_price')
                     ->label(__('Selling Price'))
-                    ->money('MAD')
+                    ->money('MAD', locale: 'en')
                     ->sortable(),
                 IconColumn::make('is_active')
                     ->label(__('Active'))

@@ -40,11 +40,11 @@ class ProductsTable
                     ->sortable(),
                 TextColumn::make('selling_price')
                     ->label(__('Selling Price'))
-                    ->money('MAD')
+                    ->money('MAD', locale: 'en')
                     ->sortable(),
                 TextColumn::make('price_before_discount')
                     ->label(__('Price Before Discount'))
-                    ->money('MAD')
+                    ->money('MAD', locale: 'en')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('has_variants')

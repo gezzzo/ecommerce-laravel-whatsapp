@@ -27,7 +27,7 @@ class DeliveryZonesTable
                     ->sortable(),
                 TextColumn::make('delivery_fee')
                     ->label(__('Delivery Fee'))
-                    ->money('MAD')
+                    ->money('MAD', locale: 'en')
                     ->sortable(),
                 TextColumn::make('external_city_id')
                     ->label(__('External ID'))
