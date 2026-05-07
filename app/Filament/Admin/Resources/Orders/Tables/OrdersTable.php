@@ -52,25 +52,17 @@ class OrdersTable
                     ->label(__('City'))
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('status')
+                    ->label(__('Status'))
+                    ->formatStateUsing(fn (?string $state): string => OrderStatusEnum::tryFrom($state)?->getLabel() ?? ($state ?? ''))
+                    ->badge()
+                    ->color(fn (Order $record): string => OrderStatusEnum::tryFrom($record->status)?->getColor() ?? 'gray'),
                 TextColumn::make('delivery_status')
                     ->label(__('Delivery Status'))
-                    ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'pending' => __('Pending'),
-                        'processing' => __('Processing'),
-                        'shipped' => __('Shipped'),
-                        'delivered' => __('Delivered'),
-                        'cancelled' => __('Cancelled'),
-                        default => $state ?? '',
-                    })
+                    ->formatStateUsing(fn (?string $state): string => DeliveryStatusEnum::tryFrom($state)?->getLabel() ?? ($state ?? ''))
                     ->badge()
-                    ->color(fn (Order $record): string => match ($record->delivery_status) {
-                        'pending' => 'warning',
-                        'processing' => 'info',
-                        'shipped' => 'primary',
-                        'delivered' => 'success',
-                        'cancelled' => 'danger',
-                        default => 'gray',
-                    }),
+                    ->color(fn (Order $record): string => DeliveryStatusEnum::tryFrom($record->delivery_status)?->getColor() ?? 'gray'),
+
                 TextColumn::make('payment_method')
                     ->label(__('Payment Method'))
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
