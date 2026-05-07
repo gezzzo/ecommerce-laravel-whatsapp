@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Orders\Schemas;
 
+use App\Enums\DeliveryStatusEnum;
 use App\Models\Coupons;
 use App\Models\DeliveryCompany;
 use App\Models\DeliveryZone;
@@ -36,15 +37,8 @@ class OrderForm
                             ->maxLength(255),
                         Select::make('delivery_status')
                             ->label(__('Delivery Status'))
-                            ->options([
-                                'pending' => __('Pending'),
-                                'processing' => __('Processing'),
-                                'shipped' => __('Shipped'),
-                                'delivered' => __('Delivered'),
-                                'cancelled' => __('Cancelled'),
-                            ])
-                            ->default('pending')
-                            ->required(),
+                            ->options(DeliveryStatusEnum::getOptions())
+                          ,
                         Toggle::make('manual_delivery_status')
                             ->label(__('Manual Delivery Status'))
                             ->helperText(__('Enable this to manage the delivery status manually.')),
