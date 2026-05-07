@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 #[Fillable([
     'order_id',
-    'user_id',
+    'admin_id',
     'action_type',
     'old_value',
     'new_value',

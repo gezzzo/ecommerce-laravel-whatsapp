@@ -289,7 +289,7 @@ class OrdersTable
 
                             // Save to order history
                             $record->orderHistories()->create([
-                                'user_id' => auth()->id(),
+                                'admin_id' => auth()->id(),
                                 'action_type' => 'status_changed',
                                 'old_value' => $oldStatus,
                                 'new_value' => $newStatus,
@@ -334,7 +334,7 @@ class OrdersTable
 
                             // Save to order history
                             $record->orderHistories()->create([
-                                'user_id' => auth()->id(),
+                                'admin_id' => auth()->id(),
                                 'action_type' => 'delivery_status_changed',
                                 'old_value' => $oldStatus,
                                 'new_value' => $newStatus,
@@ -367,7 +367,7 @@ class OrdersTable
                     ->action(function (Order $record, array $data) {
                         // Save to order history
                         $record->orderHistories()->create([
-                            'user_id' => auth()->id(),
+                            'admin_id' => auth()->id(),
                             'action_type' => 'comment_added',
                             'old_value' => null,
                             'new_value' => null,
