@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Orders\Schemas;
 
 use App\Enums\DeliveryStatusEnum;
+use App\Enums\OrderStatusEnum;
 use App\Models\Coupons;
 use App\Models\DeliveryCompany;
 use App\Models\DeliveryZone;
@@ -41,7 +42,7 @@ class OrderForm
                           ,
                         Select::make('status')
                             ->label(__('Status'))
-                            ->options(DeliveryStatusEnum::getOptions())
+                            ->options(OrderStatusEnum::getOptions())
                         ,
                         Toggle::make('manual_delivery_status')
                             ->label(__('Manual Delivery Status'))
