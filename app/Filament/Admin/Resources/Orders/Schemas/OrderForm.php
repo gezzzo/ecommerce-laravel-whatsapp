@@ -40,7 +40,7 @@ class OrderForm
                             ->options(DeliveryStatusEnum::getOptions())
                           ,
                         Select::make('status')
-                            ->label(__('Order Status'))
+                            ->label(__('Status'))
                             ->options(DeliveryStatusEnum::getOptions())
                         ,
                         Toggle::make('manual_delivery_status')
