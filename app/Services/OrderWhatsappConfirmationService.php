@@ -142,10 +142,9 @@ class OrderWhatsappConfirmationService
         $latestTracking = $order->trackingParcels->first();
 
         return implode("\n", array_filter([
-            'تتبع طلبك 🔎',
+            'لتتبع طلبك',
             "رقم الطلب: {$order->order_number}",
             'حالة الطلب: '.($order->status_label ?: 'قيد المراجعة'),
-            $order->tracking_number ? "رقم الشحنة: {$order->tracking_number}" : 'رقم الشحنة: لم يصدر بعد',
             $latestTracking?->statut_name ? "آخر تحديث: {$latestTracking->statut_name}" : null,
             $latestTracking?->situation_name ? "الوضع الحالي: {$latestTracking->situation_name}" : null,
             $latestTracking?->time ? 'وقت التحديث: '.$latestTracking->time->format('Y-m-d H:i') : null,
