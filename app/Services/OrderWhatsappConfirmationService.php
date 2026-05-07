@@ -73,7 +73,7 @@ class OrderWhatsappConfirmationService
         }
 
         $order->update([
-            'status' => 'confirmed',
+            'status' => 'Confirmed',
             'whatsapp_phone' => $this->normalizeIncomingPhone($from),
             'whatsapp_confirmed_at' => $order->whatsapp_confirmed_at ?? now(),
             'whatsapp_confirmation_message_id' => $messageId,
