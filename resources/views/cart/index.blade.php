@@ -112,11 +112,7 @@
                         <span>-{{ number_format($discount) }} درهم</span>
                     </div>
                     @endif
-                    @if($shipping > 0)
-                    <div class="bg-primary-50 text-primary-700 text-xs p-2 rounded-lg">
-                        💡 أضف منتجات بقيمة {{ number_format(500 - $subtotal) }} درهم للحصول على شحن مجاني
-                    </div>
-                    @endif
+
                     <div class="border-t border-gray-100 pt-3 flex justify-between font-bold text-lg">
                         <span>الإجمالي</span>
                         <span class="text-primary-600">{{ number_format($total) }} درهم</span>
