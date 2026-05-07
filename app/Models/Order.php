@@ -59,6 +59,11 @@ class Order extends Model
         return $this->hasMany(TrackingParcel::class);
     }
 
+    public function orderHistories(): HasMany
+    {
+        return $this->hasMany(OrderHistory::class);
+    }
+
     public function getStatusLabelAttribute(): string
     {
         return match ($this->delivery_status) {
