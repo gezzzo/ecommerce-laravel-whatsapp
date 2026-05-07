@@ -39,6 +39,10 @@ class OrderForm
                             ->label(__('Delivery Status'))
                             ->options(DeliveryStatusEnum::getOptions())
                           ,
+                        Select::make('status')
+                            ->label(__('Order Status'))
+                            ->options(DeliveryStatusEnum::getOptions())
+                        ,
                         Toggle::make('manual_delivery_status')
                             ->label(__('Manual Delivery Status'))
                             ->helperText(__('Enable this to manage the delivery status manually.')),
