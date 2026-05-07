@@ -118,10 +118,11 @@ class OrdersTable
                     ->label(__('Confirm'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (Order $record): bool => $record->whatsapp_confirmed_at === null)
+                    ->visible(fn (Order $record): bool => ($record->whatsapp_confirmed_at === null || $record->status === 'New Order'))
                     ->action(function (Order $record): void {
                         $record->update([
                             'whatsapp_confirmed_at' => now(),
+                            'status' => 'Confirmed',
                         ]);
 
                         Notification::make()
