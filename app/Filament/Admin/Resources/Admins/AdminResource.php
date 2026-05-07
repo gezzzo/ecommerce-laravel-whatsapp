@@ -22,6 +22,13 @@ class AdminResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    protected static ?int $navigationSort = 1;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Administration');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return AdminForm::configure($schema);
