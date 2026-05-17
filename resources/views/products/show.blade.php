@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', $product->name . ' - Mohtachima')
+@section('title', $product->name . ' - Regalando')
 @section('meta_description', Str::limit(strip_tags($product->description), 160))
-@section('meta_keywords', $product->name . ', ' . ($product->category->name ?? '') . ', جلابة, قفطان, ملابس نسائية, المغرب, Mohtachima')
+@section('meta_keywords', $product->name . ', ' . ($product->category->name ?? '') . ', أحذية, أحذية نسائية, أحذية رجالية, المغرب, Regalando')
 @section('og_type', 'product')
-@section('og_title', $product->name . ' - Mohtachima')
+@section('og_title', $product->name . ' - Regalando')
 @section('og_image', asset('storage/' . $product->thumbnail))
 
 @push('structured_data')
@@ -18,7 +18,7 @@
     "sku": "{{ $product->skuCode?->sku_code ?? $product->slug }}",
     "brand": {
         "@@type": "Brand",
-        "name": "Mohtachima"
+        "name": "Regalando"
     },
     "category": "{{ $product->category->name ?? '' }}",
     "offers": {
@@ -29,7 +29,7 @@
         "url": "{{ url()->current() }}",
         "seller": {
             "@@type": "Organization",
-            "name": "Mohtachima"
+            "name": "Regalando"
         }
     }
 }

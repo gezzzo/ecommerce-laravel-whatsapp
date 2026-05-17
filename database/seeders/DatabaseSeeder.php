@@ -22,9 +22,9 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             ColorSeeder::class,
             SizeSeeder::class,
-            CategorySeeder::class,
+          //  CategorySeeder::class,
             DeliveryProviderSeeder::class,
-            ProductSeeder::class,
+         //   ProductSeeder::class,
         ]);
     }
 }

@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', ($pageTitle ?? $category->name ?? $searchQuery ?? 'جميع المنتجات') . ' - Mohtachima')
-@section('meta_description', 'تسوقي ' . ($category->name ?? 'أرقى الملابس النسائية') . ' من Mohtachima. تشكيلة واسعة من الجلابة، الفساتين، والعبايات بأسعار مناسبة. شحن سريع لجميع مدن المغرب.')
-@section('meta_keywords', ($category->name ?? 'ملابس نسائية') . ', أزياء مغربية, جلابة, ملابس محجبات, فساتين, تسوق, المغرب, Mohtachima')
+@section('title', ($pageTitle ?? $category->name ?? $searchQuery ?? 'جميع الأحذية') . ' - Regalando')
+@section('meta_description', 'تسوقي ' . ($category->name ?? 'أرقى الأحذية') . ' من Regalando. تشكيلة واسعة بأسعار مناسبة. شحن سريع لجميع مدن المغرب.')
+@section('meta_keywords', ($category->name ?? 'أحذية') . ', أحذية رياضية, كلاسيك, تسوق, المغرب, Regalando')
 
 @push('structured_data')
 <script type="application/ld+json">
@@ -40,7 +40,7 @@
     <nav class="text-sm text-gray-500 mb-6 flex items-center gap-2" aria-label="مسار التصفح">
         <a href="{{ route('home') }}" class="hover:text-primary-600">الرئيسية</a>
         <span>/</span>
-        <span class="text-gray-800">{{ $category->name ?? $pageTitle ?? (isset($searchQuery) ? 'نتائج البحث: ' . $searchQuery : 'جميع المنتجات') }}</span>
+        <span class="text-gray-800">{{ $category->name ?? $pageTitle ?? (isset($searchQuery) ? 'نتائج البحث: ' . $searchQuery : 'جميع الأحذية') }}</span>
     </nav>
 
     {{-- Page Title --}}
@@ -52,7 +52,7 @@
         @elseif(isset($category))
             {{ $category->name }}
         @else
-            جميع المنتجات
+            جميع الأحذية
         @endif
     </h1>
 
@@ -146,7 +146,7 @@
                 <div class="col-span-full text-center py-20 text-gray-400">
                     <svg class="w-16 h-16 mx-auto mb-4 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     <p class="font-medium text-lg mb-2">لا توجد منتجات مطابقة</p>
-                    <p class="text-sm">جرّبي تغيير الفلتر أو البحث بكلمات مختلفة</p>
+                    <p class="text-sm">جرّب تغيير الفلتر أو البحث بكلمات مختلفة</p>
                     <a href="{{ route('products') }}" class="inline-block mt-4 text-primary-600 hover:underline text-sm font-medium">عرض جميع المنتجات ←</a>
                 </div>
                 @endforelse

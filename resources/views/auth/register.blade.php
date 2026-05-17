@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إنشاء حساب - متجري</title>
-    <meta name="description" content="أنشئ حسابك في متجري برقم هاتفك واستمتع بتجربة تسوق مميزة.">
+    <title>إنشاء حساب - Regalando</title>
+    <meta name="description" content="أنشئي حسابك في Regalando برقم هاتفك واستمتعي بتجربة تسوق مميزة.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,7 +14,18 @@
                 extend: {
                     fontFamily: { cairo: ['Cairo', 'sans-serif'] },
                     colors: {
-                        primary: { 50:'#fef3f2',100:'#fde8e6',500:'#e84340',600:'#d52a27',700:'#b21f1d' }
+                        primary: {
+                            50: '#f4f9fe',
+                            100: '#e8f3fd',
+                            200: '#cce8fa',
+                            300: '#b0dcf8',
+                            400: '#78c1f3',
+                            500: '#369ddb',
+                            600: '#2b89c5',
+                            700: '#2370a2',
+                            800: '#1d5a81',
+                            900: '#174868',
+                        }
                     }
                 }
             }
@@ -25,7 +36,7 @@
         .input-field { @apply w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all; }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-primary-50 via-white to-orange-50 flex items-center justify-center p-4">
+<body class="min-h-screen bg-gradient-to-br from-primary-50 via-white to-blue-50 flex items-center justify-center p-4">
 
 <div class="w-full max-w-md">
 
@@ -36,7 +47,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
             </svg>
         </div>
-        <span class="text-2xl font-extrabold text-gray-900">متجري</span>
+        <span class="text-2xl font-extrabold text-gray-900">Regalando</span>
     </a>
 
     {{-- Card --}}

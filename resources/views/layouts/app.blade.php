@@ -1,5 +1,5 @@
 @php
-    $siteName = $storeName ?? \App\Models\StoreSetting::storeName();
+    $siteName = 'Regalando';
     $siteContactInfo = $contactInfo ?? \App\Models\StoreSetting::contactInfo();
     $siteMetaPixelId = $metaPixelId ?? \App\Models\StoreSetting::metaPixelId();
     $sitePhone = $siteContactInfo['phone'] ?? '';
@@ -21,9 +21,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- SEO Meta Tags --}}
-    <title>@yield('title', $siteName . ' - ملابس نسائية مغربية راقية')</title>
-    <meta name="description" content="@yield('meta_description', $siteName . ' - متجرك الأول في المغرب لأرقى الملابس النسائية والمحجبات، جلابة مغربية، فساتين وعبايات. جودة عالية بأسعار مناسبة مع شحن سريع لجميع مدن المغرب.')">
-    <meta name="keywords" content="@yield('meta_keywords', 'ملابس نسائية, أزياء مغربية, جلابة مغربية, ملابس محجبات, فساتين, تسوق ملابس, المغرب, قفطان, عبايات, Mohtachima')">
+    <title>@yield('title', $siteName . ' - تسوق أفضل الأحذية للرجال والنساء')</title>
+    <meta name="description" content="@yield('meta_description', $siteName . ' - متجرك الإلكتروني الأول لأفضل الأحذية الرجالية والنسائية بأسعار منافسة وشحن سريع للمغرب. تشكيلة واسعة من الأحذية العصرية والكلاسيكية.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'أحذية, تسوق, أحذية رجالية, أحذية نسائية, عروض, خصومات, شحن, متجر إلكتروني, المغرب, Regalando')">
     <meta name="robots" content="index, follow">
     <meta name="author" content="{{ $siteName }}">
     <link rel="canonical" href="{{ url()->current() }}">
@@ -31,16 +31,16 @@
     {{-- Open Graph --}}
     <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="@yield('og_title', $siteName . ' - ملابس نسائية مغربية')">
-    <meta property="og:description" content="@yield('meta_description', $siteName . ' - متجرك الأول في المغرب لأرقى الملابس النسائية والمحجبات. شحن سريع لجميع المدن.')">
+    <meta property="og:title" content="@yield('og_title', $siteName . ' - أحذية عصرية للجميع')">
+    <meta property="og:description" content="@yield('meta_description', $siteName . ' - أفضل الأحذية بأسعار منافسة وشحن سريع')">
     <meta property="og:image" content="@yield('og_image', asset('images/og_image.png'))">
     <meta property="og:locale" content="ar_MA">
     <meta property="og:site_name" content="{{ $siteName }}">
 
     {{-- Twitter Card --}}
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('og_title', $siteName . ' - ملابس نسائية مغربية')">
-    <meta name="twitter:description" content="@yield('meta_description', $siteName . ' - متجرك الأول في المغرب لأرقى الملابس النسائية والمحجبات. شحن سريع لجميع المدن.')">
+    <meta name="twitter:title" content="@yield('og_title', $siteName . ' - أحذية عصرية للجميع')">
+    <meta name="twitter:description" content="@yield('meta_description', $siteName . ' - أفضل الأحذية بأسعار منافسة وشحن سريع')">
     <meta name="twitter:image" content="@yield('og_image', asset('images/og_image.png'))">
 
     @if(filled($siteMetaPixelId))
@@ -115,16 +115,16 @@
                     },
                     colors: {
                         primary: {
-                            50:  '#fef3f2',
-                            100: '#fde8e6',
-                            200: '#fbd0cc',
-                            300: '#f8a9a3',
-                            400: '#f2716a',
-                            500: '#e84340',
-                            600: '#d52a27',
-                            700: '#b21f1d',
-                            800: '#941f1d',
-                            900: '#7b1f1e',
+                            50: '#f4f9fe',
+                            100: '#e8f3fd',
+                            200: '#cce8fa',
+                            300: '#b0dcf8',
+                            400: '#78c1f3',
+                            500: '#369ddb',
+                            600: '#2b89c5',
+                            700: '#2370a2',
+                            800: '#1d5a81',
+                            900: '#174868',
                         },
                         accent: '#ff6b35',
                     }
@@ -135,10 +135,10 @@
 
     <style>
         * { font-family: 'Cairo', sans-serif; }
-        .gradient-hero { background: linear-gradient(135deg, #fff5f4 0%, #ffeae8 50%, #fff0ec 100%); }
+        .gradient-hero { background: linear-gradient(135deg, #f4f9fe 0%, #e8f3fd 50%, #cce8fa 100%); }
         .card-hover { transition: transform .2s, box-shadow .2s; }
         .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.1); }
-        .badge-sale { background: #e84340; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 20px; }
+        .badge-sale { background: #369ddb; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 20px; }
         .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         @keyframes fadeInDown { from { opacity:0; transform: translateY(-10px); } to { opacity:1; transform: translateY(0); } }
         @keyframes fadeInUp { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
@@ -146,14 +146,14 @@
         .animate-fade-up { animation: fadeInUp .4s ease; }
         /* Color swatch active state */
         .color-swatch { transition: all .2s; cursor: pointer; }
-        .color-swatch.active, .color-swatch:hover { transform: scale(1.15); box-shadow: 0 0 0 3px rgba(213,42,39,.4); }
+        .color-swatch.active, .color-swatch:hover { transform: scale(1.15); box-shadow: 0 0 0 3px rgba(54, 157, 219, .4); }
         .size-btn { transition: all .2s; }
-        .size-btn.active { background: #d52a27; color: #fff; border-color: #d52a27; }
+        .size-btn.active { background: #2b89c5; color: #fff; border-color: #2b89c5; }
         /* Image gallery */
         .gallery-thumb { transition: border-color .2s; }
-        .gallery-thumb.active { border-color: #d52a27 !important; }
+        .gallery-thumb.active { border-color: #2b89c5 !important; }
         /* scrollbar */
-        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-thumb { background: #e84340; border-radius: 3px; }
+        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-thumb { background: #369ddb; border-radius: 3px; }
         /* Skeleton loading */
         @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
         .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
@@ -184,8 +184,8 @@
                 <form action="{{ route('search') }}" method="GET" class="flex-1 max-w-xl hidden md:flex" role="search">
                     <div class="relative w-full">
                         <input type="text" name="q" value="{{ request('q') }}"
-                               placeholder="ابحث عن منتج..."
-                               aria-label="البحث عن منتج"
+                               placeholder="ابحث عن حذاء..."
+                               aria-label="البحث عن حذاء"
                                class="w-full border border-gray-200 rounded-xl pr-4 pl-12 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 bg-gray-50">
                         <button type="submit" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-600" aria-label="بحث">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/></svg>
@@ -267,15 +267,14 @@
             <div>
                 <div class="flex items-center gap-2 mb-4">
                     <img src="{{ asset('images/logo.png') }}" alt="{{ $siteName }}" class="h-8 w-auto">
-                    <span class="text-white font-bold text-lg">{{ $siteName }}</span>
                 </div>
-                <p class="text-sm leading-relaxed">متجرك الإلكتروني الأول لأفضل المنتجات بأسعار منافسة وشحن سريع.</p>
+                <p class="text-sm leading-relaxed">متجرك الإلكتروني الأول لأفضل الأحذية بأسعار منافسة وشحن سريع.</p>
             </div>
             <div>
                 <h4 class="text-white font-semibold mb-4">روابط سريعة</h4>
                 <ul class="space-y-2 text-sm">
                     <li><a href="{{ route('home') }}" class="hover:text-white">الرئيسية</a></li>
-                    <li><a href="{{ route('products') }}" class="hover:text-white">جميع المنتجات</a></li>
+                    <li><a href="{{ route('products') }}" class="hover:text-white">جميع الأحذية</a></li>
                     <li><a href="{{ route('offers') }}" class="hover:text-white">العروض</a></li>
                     <li><a href="{{ route('about') }}" class="hover:text-white">من نحن</a></li>
                 </ul>

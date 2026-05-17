@@ -34,7 +34,7 @@ class AdminPanelProvider extends PanelProvider
             ->authGuard('admin')
             ->login()
             ->colors([
-                'primary' => Color::Red,
+                'primary' => Color::Blue,
             ])
 
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\Filament\Admin\Resources')
@@ -42,7 +42,7 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Dashboard::class,
             ])
-            ->brandName(__('Mohtachima'))
+            ->brandName(__('Regalando'))
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\Filament\Admin\Widgets')
             ->widgets([
                 // AccountWidget::class,

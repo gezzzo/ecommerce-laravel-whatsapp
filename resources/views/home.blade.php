@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Mohtachima - متجرك الأول في المغرب لأرقى الملابس النسائية والمحجبات')
-@section('meta_description', 'تسوقي أحدث صيحات الموضة من Mohtachima. تشكيلة واسعة من الملابس النسائية، جلابة مغربية، فساتين، وعبايات. جودة عالية بأسعار مناسبة وشحن سريع لجميع مدن المغرب.')
-@section('meta_keywords', 'ملابس نسائية, أزياء مغربية, جلابة مغربية, ملابس محجبات, فساتين, تسوق ملابس, المغرب, قفطان, عبايات, Mohtachima')
+@section('title', 'Regalando - أفضل الأحذية للرجال والنساء في المغرب')
+@section('meta_description', 'تسوق أحدث صيحات الأحذية من Regalando. تشكيلة واسعة من الأحذية الرجالية والنسائية. جودة عالية بأسعار مناسبة وشحن سريع لجميع مدن المغرب.')
+@section('meta_keywords', 'أحذية رجالية, أحذية نسائية, أحذية رياضية, تسوق أحذية, المغرب, Regalando')
 
 @section('content')
 
@@ -13,15 +13,15 @@
             <div class="flex-1 text-center md:text-right">
                 <span class="inline-block bg-primary-100 text-primary-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">🎉 تشكيلة الموسم الجديد</span>
                 <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-4">
-                    تألقي بأرقى<br>
-                    <span class="text-primary-600">الملابس النسائية والمحجبات</span>
+                    اكتشف أرقى<br>
+                    <span class="text-primary-600">الأحذية الرجالية والنسائية</span>
                 </h1>
                 <p class="text-gray-500 text-lg mb-8 max-w-md mx-auto md:mx-0">
-                    تسوقي بسهولة وأمان من Mohtachima. شحن سريع مجاني لجميع المدن المغربية مع جودة تليق بك.
+                    تسوق بسهولة وأمان من Regalando. شحن سريع لجميع المدن المغربية مع جودة وراحة تليق بك.
                 </p>
                 <div class="flex gap-3 justify-center md:justify-start flex-wrap">
                     <a href="{{ route('products') }}" class="bg-primary-600 hover:bg-primary-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors" id="hero-shop-now">
-                        تسوقي الآن
+                        تسوق الآن
                     </a>
                     <a href="{{ route('offers') }}" class="border border-primary-300 text-primary-700 font-semibold px-8 py-3 rounded-xl hover:bg-primary-50 transition-colors" id="hero-offers">
                         العروض الحصرية
@@ -29,12 +29,12 @@
                 </div>
                 <div class="flex gap-8 mt-10 justify-center md:justify-start text-center">
                     <div>
-                        <div class="text-2xl font-bold text-gray-900">+5000</div>
-                        <div class="text-sm text-gray-500">تصميم متاح</div>
+                        <div class="text-2xl font-bold text-gray-900">+1000</div>
+                        <div class="text-sm text-gray-500">موديل متاح</div>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-gray-900">+20K</div>
-                        <div class="text-sm text-gray-500">عميلة سعيدة</div>
+                        <div class="text-2xl font-bold text-gray-900">+50K</div>
+                        <div class="text-sm text-gray-500">عميل سعيد</div>
                     </div>
                     <div>
                         <div class="text-2xl font-bold text-gray-900">24/7</div>
@@ -44,7 +44,7 @@
             </div>
             <div class="flex-1 flex justify-center">
                 <div class="relative w-72 h-72 md:w-96 md:h-96">
-                    <img src="{{ asset('images/hero-shopping.png') }}" alt="تسوقي أرقى الملابس النسائية" class="w-full h-full object-cover rounded-3xl">
+                    <img src="{{ asset('images/hero-shopping.png') }}" alt="تسوق أرقى الأحذية" class="w-full h-full object-cover rounded-3xl">
                     {{-- Badge --}}
                     <div class="absolute -top-3 -left-3 bg-white rounded-2xl shadow-lg p-3 text-center animate-fade-up">
                         <div class="text-xl font-bold text-primary-600">50%</div>
@@ -83,7 +83,7 @@
 {{-- ===== CATEGORIES ===== --}}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-12" aria-label="الفئات">
     <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold text-gray-900">تسوقي حسب الفئة</h2>
+        <h2 class="text-2xl font-bold text-gray-900">تسوق حسب الفئة</h2>
         <a href="{{ route('categories') }}" class="text-primary-600 text-sm font-medium hover:underline">عرض الكل ←</a>
     </div>
     <div class="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory sm:grid sm:grid-cols-4 md:grid-cols-6 sm:overflow-visible sm:pb-0">
@@ -99,7 +99,7 @@
             <span class="text-xs text-gray-400">({{ $category->products_count }})</span>
         </a>
         @empty
-        @foreach([['emoji' => '👗', 'name' => 'فساتين'], ['emoji' => '🧥', 'name' => 'جلابة مغربية'], ['emoji' => '🧕', 'name' => 'ملابس محجبات'], ['emoji' => '👘', 'name' => 'عبايات'], ['emoji' => '👚', 'name' => 'قمصان وبلوزات'], ['emoji' => '👖', 'name' => 'سراويل']] as $ph)
+        @foreach([['emoji' => '👞', 'name' => 'أحذية كلاسيك رجالي'], ['emoji' => '👟', 'name' => 'أحذية رياضية'], ['emoji' => '👠', 'name' => 'أحذية كعب عالي'], ['emoji' => '🥿', 'name' => 'أحذية فلات نسائية'], ['emoji' => '🥾', 'name' => 'أبوات'], ['emoji' => '👡', 'name' => 'صنادل']] as $ph)
         <a href="#" class="min-w-[9.5rem] sm:min-w-0 flex flex-col items-center gap-3 p-3 sm:p-4 bg-white rounded-2xl border border-gray-100 hover:border-primary-200 hover:bg-primary-50 transition-colors card-hover text-center snap-start">
             <div class="w-full aspect-square bg-primary-100 rounded-xl flex items-center justify-center text-4xl shadow-sm">{{ $ph['emoji'] }}</div>
             <span class="text-sm font-bold text-gray-800">{{ $ph['name'] }}</span>
@@ -146,10 +146,10 @@
             <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium mb-3 inline-block">{{ $promoBanner['badge'] }}</span>
             @endif
             <h2 class="text-3xl font-extrabold mb-2">{{ $promoBanner['title'] ?? 'عروض حصرية على أحدث الموديلات' }}</h2>
-            <p class="text-primary-100 text-lg">{{ $promoBanner['subtitle'] ?? 'اكتشفي تشكيلتنا الجديدة بأسعار لا تقاوم' }}</p>
+            <p class="text-primary-100 text-lg">{{ $promoBanner['subtitle'] ?? 'اكتشف تشكيلتنا الجديدة بأسعار لا تقاوم' }}</p>
         </div>
         <a href="{{ route('offers') }}" class="relative z-10 bg-white text-primary-700 font-bold px-8 py-3 rounded-xl hover:bg-primary-50 transition-colors shrink-0" id="promo-banner-cta">
-            تسوقي العروض
+            تسوق العروض
         </a>
     </div>
 </section>
